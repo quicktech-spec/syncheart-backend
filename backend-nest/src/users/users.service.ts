@@ -30,20 +30,28 @@ export class UsersService {
 
         // Backfill invite_code for users registered before this feature was added
         if (!user.invite_code) {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let code = '';
-            for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
-            user.invite_code = code;
-            await this.usersRepo.save(user);
+            try {
+                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                let code = '';
+                for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+
+                // Use raw query to avoid ORM field validation issues
+                await this.usersRepo.query(
+                    `UPDATE users SET invite_code = $1 WHERE id = $2 AND (invite_code IS NULL OR invite_code = '')`,
+                    [code, userId]
+                );
+                user.invite_code = code;
+            } catch (e) {
+                // Silently continue — invite_code backfill is non-critical
+                console.error('invite_code backfill error:', e.message);
+            }
         }
 
         return {
             id: user.id,
             email: user.email,
-            display_name: user.display_name,
-            invite_code: user.invite_code,
-            attachment_style: user.attachment_style,
-            love_language: user.love_language,
+            display_name: user.display_name ?? null,
+            invite_code: user.invite_code ?? null,
             created_at: user.created_at,
         };
     }
