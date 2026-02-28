@@ -111,7 +111,7 @@ export class UsersService {
             throw new BadRequestException('Access denied to this relationship');
         }
 
-        const msg = this.messagesRepo.create({ relationship: rel, sender_id: senderId, ciphertext, iv, auth_tag });
+        const msg = this.messagesRepo.create({ relationship_id: relationshipId, sender_id: senderId, ciphertext, iv, auth_tag });
         await this.messagesRepo.save(msg);
         return { id: msg.id, created_at: msg.created_at };
     }
@@ -128,10 +128,9 @@ export class UsersService {
         }
 
         return this.messagesRepo.find({
-            where: { relationship: { id: relationshipId } },
+            where: { relationship_id: relationshipId },
             order: { created_at: 'ASC' },
             take: 100,
-            select: ['id', 'sender_id', 'ciphertext', 'iv', 'auth_tag', 'created_at'],
         });
     }
 
@@ -144,7 +143,7 @@ export class UsersService {
         });
 
         for (const rel of relationships) {
-            await this.messagesRepo.delete({ relationship: { id: rel.id } });
+            await this.messagesRepo.delete({ relationship_id: rel.id });
             await this.checkinsRepo.delete({ relationship: { id: rel.id } });
             await this.programProgressRepo.delete({ relationship_id: rel.id });
             await this.conflictsRepo.delete({ relationship: { id: rel.id } });

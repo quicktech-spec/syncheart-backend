@@ -1,29 +1,32 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { Relationship } from './relationship.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 'typeorm';
 
+/**
+ * Stores ONLY encrypted message data.
+ * Server NEVER has access to plaintext — AES-256-GCM encrypted client-side.
+ * relationship_id is stored as a plain string to avoid circular entity imports.
+ */
 @Entity('messages')
-@Index(['relationship', 'created_at'])
+@Index(['relationship_id', 'created_at'])
 export class Message {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(() => Relationship, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'relationship_id' })
-    relationship: Relationship;
+    @Column({ name: 'relationship_id' })
+    relationship_id: string;
 
-    // Sender user ID – stored plaintext for routing only
+    /** Sender user UUID – stored only for routing, not content identification */
     @Column({ name: 'sender_id' })
     sender_id: string;
 
-    // AES-GCM encrypted payload (Base64). Server NEVER sees plaintext.
+    /** AES-GCM encrypted message payload (Base64). Server cannot decrypt this. */
     @Column({ type: 'text' })
     ciphertext: string;
 
-    // IV used for AES-GCM – required for decryption, not secret
-    @Column({ name: 'iv', length: 32 })
+    /** Initialization vector for AES-GCM (not secret, required for decryption) */
+    @Column({ name: 'iv', length: 64 })
     iv: string;
 
-    // Auth tag from AES-GCM (ensures integrity)
+    /** Auth tag confirming message integrity */
     @Column({ name: 'auth_tag', length: 64 })
     auth_tag: string;
 
