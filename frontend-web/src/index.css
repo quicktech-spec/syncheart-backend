@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --color-dark: #1E1E2C;
+  --color-primary: #FF3366;
+  --color-secondary: #00D68F;
+  --color-card: #2C2C3E;
+  --color-sensual: #8A2BE2;
+}
+
+body {
+  background-color: var(--color-dark);
+  color: white;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
