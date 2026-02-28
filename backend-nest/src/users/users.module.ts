@@ -8,9 +8,10 @@ import { Checkin } from '../entities/checkin.entity';
 import { Conflict } from '../entities/conflict.entity';
 import { AiInsight } from '../entities/ai-insight.entity';
 import { ProgramProgress } from '../entities/program-progress.entity';
+import { Message } from '../entities/message.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User, Relationship, Checkin, Conflict, AiInsight, ProgramProgress])],
+    imports: [TypeOrmModule.forFeature([User, Relationship, Checkin, Conflict, AiInsight, ProgramProgress, Message])],
     providers: [UsersService],
     controllers: [UsersController],
     exports: [UsersService],

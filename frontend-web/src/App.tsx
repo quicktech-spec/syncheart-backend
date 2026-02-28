@@ -10,6 +10,7 @@ import Insights from './pages/Insights';
 import Profile from './pages/Profile';
 import Onboarding from './pages/Onboarding';
 import { Memories, LoveLanguage, Mood, Journal, Goals, AccountSettings, PrivacySettings, NotificationSettings, RelationshipSettings } from './pages/Placeholders';
+import Connect from './pages/Connect';
 
 const AppLogo = () => (
   <div className="relative flex items-center justify-center w-8 h-8 mr-2">
@@ -59,6 +60,19 @@ const BottomNav = () => {
 const Layout = () => {
   return (
     <div className="h-screen bg-[#1E1E2C] overflow-hidden w-full max-w-md mx-auto relative shadow-2xl sm:border sm:border-[#2C2C3E] flex flex-col">
+      <style>{`
+        @keyframes riseUp {
+          0%   { transform: translateY(0) scale(1); opacity: 0; }
+          10%  { opacity: 1; }
+          90%  { opacity: 0.5; }
+          100% { transform: translateY(-100vh) scale(0.5) rotate(20deg); opacity: 0; }
+        }
+        @keyframes floatOrb {
+          0%, 100% { transform: translate(0,0) scale(1); }
+          33% { transform: translate(30px,-40px) scale(1.05); }
+          66% { transform: translate(-20px,20px) scale(0.97); }
+        }
+      `}</style>
       <TopNav />
       <div className="flex-1 overflow-y-auto pb-24 relative" style={{ scrollbarWidth: 'none' }}>
         <Outlet />
@@ -97,6 +111,7 @@ function App() {
           ) : (
             <Route element={<Layout />}>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/connect" element={<Connect />} />
               <Route path="/insights" element={<Insights />} />
               <Route path="/profile" element={<Profile />} />
 

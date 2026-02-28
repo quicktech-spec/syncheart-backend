@@ -6,6 +6,7 @@ import { Conflict } from '../entities/conflict.entity';
 import { AiInsight } from '../entities/ai-insight.entity';
 import { Program } from '../entities/program.entity';
 import { ProgramProgress } from '../entities/program-progress.entity';
+import { Message } from '../entities/message.entity';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -18,6 +19,6 @@ export const DatabaseConfig: TypeOrmModuleOptions = {
         ? { url: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }
         : { database: 'syncheart.sqlite' }
     ),
-    entities: [User, Relationship, Checkin, Conflict, AiInsight, Program, ProgramProgress],
+    entities: [User, Relationship, Checkin, Conflict, AiInsight, Program, ProgramProgress, Message],
     synchronize: true, // true in MVP to auto-build tables
 } as TypeOrmModuleOptions;
