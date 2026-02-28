@@ -14,8 +14,10 @@ export class UsersController {
 
     @Get('me/relationship')
     async getRelationship(@Request() req) {
-        return this.usersService.getRelationship(req.user.id);
+        const rel = await this.usersService.getRelationship(req.user.id);
+        return { data: rel }; // Always JSON, never null/204
     }
+
 
     @Post('sync-couple')
     async syncCouple(@Request() req, @Body() body: { invite_code: string }) {

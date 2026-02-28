@@ -112,9 +112,10 @@ export default function Connect() {
                     axios.get(`${BASE_URL}/api/v1/users/me/relationship`, { headers: authHeaders }),
                 ]);
                 setProfile(profRes.data);
-                if (relRes.data) {
-                    setRelationship(relRes.data);
-                    const key = await deriveKey(relRes.data.relationship_id);
+                const relData = relRes.data?.data;  // unwrap { data: rel }
+                if (relData) {
+                    setRelationship(relData);
+                    const key = await deriveKey(relData.relationship_id);
                     setCryptoKey(key);
                 }
             } catch (e) {
