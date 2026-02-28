@@ -1,7 +1,15 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, BeforeInsert } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { Relationship } from './relationship.entity';
 import { Checkin } from './checkin.entity';
+
+function generateInviteCode(): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No confusable chars
+    let result = '';
+    for (let i = 0; i < 8; i++) {
+        result += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return result;
+}
 
 @Entity('users')
 export class User {
@@ -30,8 +38,10 @@ export class User {
     created_at: Date;
 
     @BeforeInsert()
-    generateInviteCode() {
-        this.invite_code = uuidv4().replace(/-/g, '').substring(0, 8).toUpperCase();
+    setInviteCode() {
+        if (!this.invite_code) {
+            this.invite_code = generateInviteCode();
+        }
     }
 
     @OneToMany(() => Relationship, relationship => relationship.partner_1)

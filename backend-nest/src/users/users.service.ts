@@ -25,13 +25,29 @@ export class UsersService {
 
     /** Get current user's profile including invite code */
     async getProfile(userId: string) {
-        const user = await this.usersRepo.findOne({
-            where: { id: userId },
-            select: ['id', 'email', 'display_name', 'invite_code', 'attachment_style', 'love_language', 'created_at'],
-        });
+        const user = await this.usersRepo.findOne({ where: { id: userId } });
         if (!user) throw new NotFoundException('User not found');
-        return user;
+
+        // Backfill invite_code for users registered before this feature was added
+        if (!user.invite_code) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+            user.invite_code = code;
+            await this.usersRepo.save(user);
+        }
+
+        return {
+            id: user.id,
+            email: user.email,
+            display_name: user.display_name,
+            invite_code: user.invite_code,
+            attachment_style: user.attachment_style,
+            love_language: user.love_language,
+            created_at: user.created_at,
+        };
     }
+
 
     /** Link two users as a couple using invite code */
     async syncCouple(requesterId: string, inviteCode: string) {
