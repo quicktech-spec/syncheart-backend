@@ -1,0 +1,20 @@
+version: "1"
+services:
+  - type: web
+    name: syncheart-backend
+    env: node
+    rootDir: backend-nest
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: syncheart-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+
+databases:
+  - name: syncheart-db
+    databaseName: syncheart
+    user: syncheart_user
