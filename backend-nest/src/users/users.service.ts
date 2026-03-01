@@ -28,8 +28,6 @@ export class UsersService {
         const user = await this.usersRepo.findOne({ where: { id: userId } });
         if (!user) throw new NotFoundException('User not found');
 
-        throw new BadRequestException(`TRACE: User found with email ${user.email}, auth_id ${userId}, ID: ${user.id}`);
-
         // Backfill invite_code for users registered before this feature was added
         if (!user.invite_code) {
             try {
