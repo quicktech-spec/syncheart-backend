@@ -53,8 +53,17 @@ export class UsersService {
             email: user.email,
             display_name: user.display_name ?? null,
             invite_code: user.invite_code ?? null,
+            birthday: user.birthday ?? null,
+            attachment_style: user.attachment_style ?? null,
+            love_language: user.love_language ?? null,
             created_at: user.created_at,
         };
+    }
+
+    /** Update current user's profile */
+    async updateProfile(userId: string, data: { display_name?: string, birthday?: string, attachment_style?: string, love_language?: string }) {
+        await this.usersRepo.update({ id: userId }, data);
+        return this.getProfile(userId);
     }
 
 

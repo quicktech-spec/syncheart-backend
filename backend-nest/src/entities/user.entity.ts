@@ -25,6 +25,9 @@ export class User {
     @Column({ nullable: true })
     display_name: string;
 
+    @Column({ nullable: true })
+    birthday: string;
+
     @Column({ unique: true, nullable: true })
     invite_code: string;
 

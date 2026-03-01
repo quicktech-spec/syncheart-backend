@@ -14,6 +14,11 @@ async function runMigrations(dataSource: DataSource) {
             ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name VARCHAR(255)
         `).catch(() => { });
 
+        // Add birthday column if it doesn't exist
+        await dataSource.query(`
+            ALTER TABLE users ADD COLUMN IF NOT EXISTS birthday VARCHAR(50)
+        `).catch(() => { });
+
         // Create messages table if it doesn't exist
         await dataSource.query(`
             CREATE TABLE IF NOT EXISTS messages (
