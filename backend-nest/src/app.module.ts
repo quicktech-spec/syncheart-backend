@@ -9,6 +9,8 @@ import { AiModule } from './ai/ai.module';
 import { ProgramsModule } from './programs/programs.module';
 import { UsersModule } from './users/users.module';
 
+import { DebugController } from './debug.controller';
+
 @Module({
     imports: [
         TypeOrmModule.forRoot(DatabaseConfig),
@@ -19,7 +21,7 @@ import { UsersModule } from './users/users.module';
         ProgramsModule,
         UsersModule,
     ],
-    controllers: [AppController],
+    controllers: [AppController, DebugController],
     providers: [],
 })
 export class AppModule { }
