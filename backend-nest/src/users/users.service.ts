@@ -106,6 +106,7 @@ export class UsersService {
                 { partner_2: { id: userId }, status: 'active' },
             ],
             relations: ['partner_1', 'partner_2'],
+            order: { start_date: 'DESC' }
         });
         if (!rel) return null;
         const partner = rel.partner_1.id === userId ? rel.partner_2 : rel.partner_1;
