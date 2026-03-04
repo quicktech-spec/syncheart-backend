@@ -125,7 +125,7 @@ export class UsersService {
         if (!rel) throw new NotFoundException('Relationship not found');
 
         // Security: ensure sender belongs to this relationship
-        if (rel.partner_1.id !== senderId && rel.partner_2.id !== senderId) {
+        if (rel.partner_1?.id !== senderId && rel.partner_2?.id !== senderId) {
             throw new BadRequestException('Access denied to this relationship');
         }
 
@@ -141,7 +141,7 @@ export class UsersService {
             relations: ['partner_1', 'partner_2'],
         });
         if (!rel) throw new NotFoundException('Relationship not found');
-        if (rel.partner_1.id !== userId && rel.partner_2.id !== userId) {
+        if (rel.partner_1?.id !== userId && rel.partner_2?.id !== userId) {
             throw new BadRequestException('Access denied');
         }
 
