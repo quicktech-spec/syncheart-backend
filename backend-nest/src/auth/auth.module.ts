@@ -14,7 +14,7 @@ dotenv.config();
         JwtModule.register({
             global: true,
             secret: process.env.JWT_SECRET || 'syncHeartSecretKey123',
-            signOptions: { expiresIn: '1h' },
+            signOptions: { expiresIn: '365d' },
         }),
     ],
     providers: [AuthService, JwtStrategy],
