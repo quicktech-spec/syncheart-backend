@@ -117,6 +117,28 @@ export class UsersService {
         };
     }
 
+    /** Permanently severe the relationship between two users */
+    async breakRelationship(userId: string) {
+        const rel = await this.relationshipsRepo.findOne({
+            where: [
+                { partner_1: { id: userId }, status: 'active' },
+                { partner_2: { id: userId }, status: 'active' },
+            ],
+            relations: ['partner_1', 'partner_2'],
+        });
+        if (!rel) throw new NotFoundException('No active relationship found');
+
+        // Hard delete all relationship data (messages, insights, checkins)
+        await this.messagesRepo.delete({ relationship_id: rel.id });
+        await this.checkinsRepo.delete({ relationship: { id: rel.id } });
+        await this.programProgressRepo.delete({ relationship_id: rel.id });
+        await this.conflictsRepo.delete({ relationship: { id: rel.id } });
+        await this.aiInsightsRepo.delete({ relationship: { id: rel.id } });
+        await this.relationshipsRepo.delete(rel.id);
+
+        return { message: 'Sync connection severed successfully' };
+    }
+
     /** Send E2E encrypted message — server stores ciphertext only */
     async sendMessage(senderId: string, relationshipId: string, ciphertext: string, iv: string, auth_tag: string) {
         const rel = await this.relationshipsRepo.findOne({

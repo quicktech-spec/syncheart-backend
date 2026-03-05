@@ -3,5 +3,11 @@
     "outputDirectory": "dist",
     "env": {
         "VITE_API_URL": "https://syncheart-backend-production.up.railway.app"
-    }
+    },
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
 }

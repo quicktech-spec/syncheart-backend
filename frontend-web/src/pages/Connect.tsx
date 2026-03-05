@@ -11,6 +11,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useSyncStore } from '../store';
 
@@ -169,6 +170,9 @@ export default function Connect() {
                 { headers: authHeaders }
             );
             setRelationship(res.data);
+            if (res.data?.partner) {
+                useSyncStore.getState().setPartner(res.data.partner);
+            }
             const key = await deriveKey(res.data.relationship_id);
             setCryptoKey(key);
         } catch (e: any) {
@@ -321,6 +325,21 @@ export default function Connect() {
                         🔒 E2E Encrypted
                     </div>
                 </div>
+            )}
+
+            {relationship && (
+                <Link to="/chat" style={{ textDecoration: 'none' }}>
+                    <div style={{
+                        ...cardStyle,
+                        background: 'linear-gradient(135deg, rgba(138,43,226,0.2), rgba(255,51,102,0.2))',
+                        border: '1px solid rgba(255,51,102,0.3)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
+                        cursor: 'pointer', transition: 'transform 0.2s', padding: '18px'
+                    }}>
+                        <span style={{ fontSize: '24px' }}>✨</span>
+                        <span style={{ fontWeight: '800', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '14px' }}>Open Private Space</span>
+                    </div>
+                </Link>
             )}
 
             {/* ENCRYPTED CHAT */}

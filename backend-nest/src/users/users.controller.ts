@@ -23,6 +23,11 @@ export class UsersController {
         return { data: rel }; // Always JSON, never null/204
     }
 
+    @Delete('me/relationship')
+    async breakRelationship(@Request() req) {
+        return this.usersService.breakRelationship(req.user.id);
+    }
+
 
     @Post('sync-couple')
     async syncCouple(@Request() req, @Body() body: { invite_code: string }) {

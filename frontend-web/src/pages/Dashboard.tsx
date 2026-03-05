@@ -1,155 +1,165 @@
-import React, { useState } from 'react';
-import { Heart, Activity, Flame, ChevronRight, Send, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useSyncStore } from '../store';
+import { Heart, MessageCircle, Sparkles, Calendar, Share2, ArrowRight, Activity, Flame, HeartHandshake } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 
-export default function Dashboard() {
-    const [isNudgeModalOpen, setNudgeModalOpen] = useState(false);
-    const [sent, setSent] = useState(false);
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://syncheart-backend-production.up.railway.app';
 
-    const handleSendNudge = (emoji: string) => {
-        // Trigger confetti from bottom
+export default function Dashboard() {
+    const user = useSyncStore(s => s.user);
+    const partner = useSyncStore(s => s.partner);
+    const profile = useSyncStore(s => s.profile);
+    const partnerName = partner ? (partner as any).display_name || partner.email.split('@')[0] : 'your partner';
+    const [gamificationLevel, setGamificationLevel] = useState('New Bloom');
+    const [isPartnerLive, setIsPartnerLive] = useState(true); // placeholder for WebSocket logic
+
+    const handleSendNudge = () => {
         confetti({
             particleCount: 100,
             spread: 70,
-            origin: { y: 1 },
-            colors: ['#FF3366', '#FFB000', '#00D68F']
+            origin: { y: 0.6 },
+            colors: ['#FF3366', '#FFB000', '#63001A']
         });
-        setSent(true);
-        setTimeout(() => {
-            setSent(false);
-            setNudgeModalOpen(false);
-        }, 2000);
+        alert(`💖 Nudge sent to ${partnerName}!`);
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="p-6 pt-8 text-white relative h-full flex flex-col"
-        >
-            <h1 className="text-3xl font-black tracking-tighter mb-8 drop-shadow-md">Good morning, Shubham.</h1>
+        <div className="min-h-screen bg-cream pb-32">
+            {/* Romantic Hero Header */}
+            <div className="bg-mesh-romantic px-8 pt-16 pb-24 rounded-b-[70px] shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-10 opacity-10 animate-heartbeat">
+                    <Heart size={200} fill="white" />
+                </div>
 
-            {/* Sync Card */}
-            <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="bg-gradient-to-br from-[#FF3366] to-[#ff6b9a] rounded-3xl p-8 mb-6 relative overflow-hidden shadow-[0_20px_40px_rgba(255,51,102,0.4)] transition-shadow duration-300 group"
-            >
                 <motion.div
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                    className="absolute top-0 right-0 p-8 opacity-20"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="relative z-10"
                 >
-                    <Heart size={140} />
+                    <div className="flex items-center gap-2 mb-4">
+                        {isPartnerLive ? (
+                            <span className="bg-white/90 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] text-primary shadow-lg flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> {partnerName} is Local
+                            </span>
+                        ) : (
+                            <span className="bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] text-white border border-white/20">
+                                Neural Sync Active
+                            </span>
+                        )}
+                    </div>
+                    <h1 className="text-6xl font-black text-white tracking-tighter leading-none mb-4 italic">
+                        Hello, {profile?.display_name?.split(' ')[0] || 'Lover'}
+                    </h1>
+                    <p className="text-white/60 text-xl font-medium max-w-[280px] leading-tight">
+                        Your connection frequency is <span className="text-white font-black underline decoration-accent underline-offset-4">Radiant</span> today.
+                    </p>
                 </motion.div>
-                <div className="absolute bottom-[-50px] left-[-20px] w-48 h-48 bg-white/10 rounded-full blur-2xl"></div>
-                <div className="relative z-10 flex flex-col items-start gap-2">
-                    <p className="font-bold text-white/80 uppercase tracking-[0.2em] text-[10px] drop-shadow-sm">Couples Sync</p>
-                    <p className="text-7xl font-black drop-shadow-lg tracking-tighter">94<span className="text-3xl">%</span></p>
-                    <p className="text-xs font-bold bg-black/20 px-4 py-2 text-white rounded-full mt-2 shadow-inner backdrop-blur-md border border-white/10">You are deeply connected today.</p>
-                </div>
-            </motion.div>
-
-            {/* Daily Actions */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
-                <Link to="/mood" className="bg-[#2C2C3E]/80 backdrop-blur-lg border border-white/5 hover:bg-[#3d3d52]/90 hover:border-white/20 transition-all duration-300 p-6 rounded-3xl flex flex-col gap-4 items-center group shadow-xl hover:-translate-y-1 hover:shadow-2xl active:scale-95">
-                    <div className="bg-gradient-to-br from-[#00D68F]/20 to-[#00b377]/10 p-5 rounded-2xl text-[#00D68F] shadow-[inset_0_0_15px_rgba(0,214,143,0.3)] group-hover:drop-shadow-[0_0_10px_rgba(0,214,143,0.8)] transition-all">
-                        <Activity size={32} />
-                    </div>
-                    <span className="font-black text-gray-100 tracking-wide">Daily Check-in</span>
-                </Link>
-                <Link to="/love-language" className="bg-[#2C2C3E]/80 backdrop-blur-lg border border-white/5 hover:bg-[#3d3d52]/90 hover:border-white/20 transition-all duration-300 p-6 rounded-3xl flex flex-col gap-4 items-center group shadow-xl hover:-translate-y-1 hover:shadow-2xl active:scale-95">
-                    <div className="bg-gradient-to-br from-[#8A2BE2]/20 to-[#6610f2]/10 p-5 rounded-2xl text-[#8A2BE2] shadow-[inset_0_0_15px_rgba(138,43,226,0.3)] group-hover:drop-shadow-[0_0_10px_rgba(138,43,226,0.8)] transition-all">
-                        <Flame size={32} />
-                    </div>
-                    <span className="font-black text-gray-100 tracking-wide">Start DNA Quiz</span>
-                </Link>
             </div>
 
-            {/* Tasks Queue */}
-            <h2 className="text-gray-500 font-black text-[10px] uppercase tracking-[0.2em] mb-4 ml-2 flex items-center gap-2">Up Next <span className="text-[#FF3366] drop-shadow-[0_0_5px_rgba(255,51,102,0.8)]">✦</span></h2>
-            <div className="space-y-4">
-                <Link to="/journal" className="block bg-[#2C2C3E]/80 backdrop-blur-md border border-white/5 p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 active:scale-95 group">
-                    <div>
-                        <p className="font-bold text-white tracking-wide">Review 'Conflict Log' notes.</p>
-                        <p className="text-xs text-[#FFB000] font-bold mt-1 tracking-wider uppercase">— 10 mins ago</p>
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-[#FF3366] transition-colors duration-300 shadow-inner">
-                        <ChevronRight size={20} className="text-gray-400 group-hover:text-white transition-colors" />
-                    </div>
-                </Link>
-                <div onClick={() => setNudgeModalOpen(true)} className="bg-[#2C2C3E]/80 backdrop-blur-md border border-white/5 p-5 rounded-3xl flex justify-between items-center cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 active:scale-95 group">
-                    <div>
-                        <p className="font-bold text-white tracking-wide">Send a 'Thinking of you' nudge.</p>
-                        <p className="text-xs text-[#FFB000] font-bold mt-1 tracking-wider uppercase">— Suggested</p>
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-[#FF3366] transition-colors duration-300 shadow-inner">
-                        <ChevronRight size={20} className="text-gray-400 group-hover:text-white transition-colors" />
-                    </div>
-                </div>
-            </div>
+            {/* Content Area */}
+            <div className="px-6 -mt-10 space-y-8">
 
-            {/* Interactive Nudge Modal */}
-            <AnimatePresence>
-                {isNudgeModalOpen && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+                {/* 1. Main Sync Card - Elevated */}
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="premium-card p-8 relative overflow-hidden group border-2 border-primary/5"
+                >
+                    <div className="flex justify-between items-start mb-10">
+                        <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center text-primary animate-heartbeat">
+                            <Heart size={36} fill="currentColor" />
+                        </div>
+                        <div className="text-right">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-romantic/30">Couples Sync</p>
+                            <h2 className="text-5xl font-black text-romantic tracking-tighter">98%</h2>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="h-4 bg-rose-50 rounded-full overflow-hidden border border-rose-100">
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: '98%' }}
+                                transition={{ duration: 1.5, ease: "easeOut" }}
+                                className="h-full bg-gradient-to-r from-primary to-romantic"
+                            />
+                        </div>
+                        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-romantic/40">
+                            <span>Deep Attunement</span>
+                            <span className="text-primary">Level: {gamificationLevel}</span>
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={handleSendNudge}
+                        className="w-full mt-10 bg-primary text-white py-6 rounded-[30px] font-black text-xs uppercase tracking-[0.4em] shadow-xl shadow-primary/20 hover:bg-romantic transition-all"
                     >
-                        <motion.div
-                            initial={{ scale: 0.9, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0.9, y: 20 }}
-                            className="bg-gradient-to-br from-[#2C2C3E] to-[#1E1E2C] w-full max-w-sm rounded-[32px] p-8 relative border border-white/10 shadow-[0_20px_60px_rgba(255,51,102,0.3)] text-center"
-                        >
-                            <button onClick={() => setNudgeModalOpen(false)} className="absolute top-4 right-4 p-2 bg-white/5 rounded-full hover:bg-white/10">
-                                <X size={20} className="text-white/50" />
-                            </button>
+                        Send Heart Pulse
+                    </button>
+                </motion.div>
 
-                            {!sent ? (
-                                <>
-                                    <h3 className="text-2xl font-black mb-2 text-white drop-shadow-md">Send a Nudge</h3>
-                                    <p className="text-sm text-gray-400 mb-8 font-medium">Let your partner know you're thinking of them right now.</p>
+                {/* 2. Mini Grid Features */}
+                <div className="grid grid-cols-2 gap-6">
+                    <Link to="/chat" className="premium-card p-6 flex flex-col items-center text-center group">
+                        <div className="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:rotate-12">
+                            <MessageCircle size={24} />
+                        </div>
+                        <h4 className="font-black text-romantic tracking-tight">Whispers</h4>
+                        <p className="text-[10px] uppercase font-bold text-romantic/30 mt-1 tracking-widest">Secret Chat</p>
+                    </Link>
 
-                                    <div className="grid grid-cols-2 gap-4 mb-6">
-                                        {['❤️ Love you!', '🔥 So hot', '🫂 Need a hug', '☕ Coffee later?'].map((txt, i) => (
-                                            <motion.button
-                                                key={i}
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 0.95 }}
-                                                onClick={() => handleSendNudge(txt)}
-                                                className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl py-4 shadow-inner text-2xl"
-                                            >
-                                                {txt.split(' ')[0]}
-                                                <div className="text-xs font-bold text-gray-300 mt-2 tracking-wide uppercase">{txt.split(' ').slice(1).join(' ')}</div>
-                                            </motion.button>
-                                        ))}
-                                    </div>
-                                    <div className="relative">
-                                        <input type="text" placeholder="Write a custom note..." className="w-full bg-black/30 border border-white/10 rounded-full py-4 px-6 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#FF3366] shadow-inner" />
-                                        <button onClick={() => handleSendNudge('custom')} className="absolute right-2 top-2 bottom-2 bg-[#FF3366] rounded-full p-2 w-10 h-10 flex items-center justify-center hover:scale-105 active:scale-95 shadow-md">
-                                            <Send size={16} />
-                                        </button>
-                                    </div>
-                                </>
-                            ) : (
-                                <motion.div
-                                    initial={{ scale: 0.5, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    className="py-12"
-                                >
-                                    <Heart size={64} className="text-[#00D68F] mx-auto mb-4 animate-pulse drop-shadow-[0_0_20px_rgba(0,214,143,0.8)]" />
-                                    <h3 className="text-2xl font-black mb-2 text-white">Nudge Delivered!</h3>
-                                    <p className="text-sm text-gray-400 font-medium">Their phone just lit up.</p>
-                                </motion.div>
-                            )}
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </motion.div>
+                    <Link to="/activities" className="premium-card p-6 flex flex-col items-center text-center group">
+                        <div className="w-12 h-12 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:rotate-12">
+                            <Sparkles size={24} />
+                        </div>
+                        <h4 className="font-black text-romantic tracking-tight">Rituals</h4>
+                        <p className="text-[10px] uppercase font-bold text-romantic/30 mt-1 tracking-widest">Play Area</p>
+                    </Link>
+                </div>
+
+                {/* 3. Daily Intention Card */}
+                <div className="premium-card p-8 bg-romantic text-white overflow-hidden relative">
+                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                        <Calendar size={100} />
+                    </div>
+                    <div className="relative z-10">
+                        <h3 className="text-xl font-black mb-2 tracking-tight">Evening Ritual</h3>
+                        <p className="text-white/50 text-sm font-medium mb-8 leading-relaxed italic">
+                            "The deepest connection happens in the smallest moments of presence."
+                        </p>
+                        <div className="flex items-center gap-3 bg-white/10 px-6 py-4 rounded-2xl border border-white/10">
+                            <Calendar size={18} className="text-primary" />
+                            <span className="text-xs font-black uppercase tracking-widest">Plan Date Night</span>
+                            <ArrowRight size={16} className="ml-auto" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* 4. Feature Showcase (Inspired by Reference) */}
+                <div className="py-10 text-center">
+                    <h2 className="section-header text-romantic mb-4">Deep Hearts.</h2>
+                    <p className="text-romantic/30 font-medium mb-10 max-w-[280px] mx-auto italic">Everything you need to nurture a conscious and lasting bond.</p>
+
+                    <div className="space-y-6">
+                        {[
+                            { icon: Activity, title: "Bio-Sync", desc: "Shared wellness frequency tracking.", col: "bg-emerald-50 text-emerald-500" },
+                            { icon: Flame, title: "Intensity", desc: "Passionate connection rituals.", col: "bg-rose-50 text-rose-500" },
+                            { icon: HeartHandshake, title: "Support", desc: "AI-driven emotional intelligence.", col: "bg-blue-50 text-blue-500" }
+                        ].map((item, i) => (
+                            <div key={i} className="flex items-center gap-6 text-left premium-card p-6">
+                                <div className={`w-14 h-14 rounded-2xl ${item.col} flex items-center justify-center shadow-inner`}>
+                                    <item.icon size={24} />
+                                </div>
+                                <div>
+                                    <h4 className="font-black text-romantic tracking-tight">{item.title}</h4>
+                                    <p className="text-[10px] font-bold text-romantic/30 uppercase tracking-widest mt-0.5">{item.desc}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }

@@ -1,188 +1,284 @@
-import React, { useState } from 'react';
-import { Camera, Settings, LogOut, Bell, Shield, Heart, HeartHandshake, Smile, BookHeart, Target, Flame, CalendarHeart, ChevronRight, Image as ImageIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import {
+    Camera, Settings, LogOut, Heart, HeartHandshake, Shield,
+    CalendarHeart, ChevronLeft, Copy, User, Sparkles,
+    Edit2, Check, Share2, Award, ArrowRight, Database
+} from 'lucide-react';
 import { useSyncStore } from '../store';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { getAvatarUrl } from '../utils/avatar';
+import { motion } from 'framer-motion';
+import { sendWS } from '../utils/wsProvider';
+
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://syncheart-backend-production.up.railway.app';
 
 export default function Profile() {
-    const setUser = useSyncStore(s => s.setUser);
-    const [profilePic, setProfilePic] = useState("https://i.pravatar.cc/150?u=a042581f4e29026024d");
+    const user = useSyncStore(s => s.user);
+    const partner = useSyncStore(s => s.partner);
+    const profile = useSyncStore(s => s.profile);
+    const setProfile = useSyncStore(s => s.setProfile);
+    const customAvatar = useSyncStore(s => s.customAvatar);
+    const setCustomAvatar = useSyncStore(s => s.setCustomAvatar);
+    const navigate = useNavigate();
 
-    const handleLogout = () => {
-        setUser(null);
-    };
+    const [isEditing, setIsEditing] = useState(false);
+    const [editForm, setEditForm] = useState<any>({});
+    const [profilePic, setProfilePic] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!user?.id) return;
+        setProfilePic(customAvatar || getAvatarUrl(user.id));
+
+        axios.get(`${BASE_URL}/api/v1/users/me`, {
+            headers: { Authorization: `Bearer ${user.id}` }
+        }).then(res => {
+            setProfile(res.data);
+            setEditForm(res.data);
+        }).catch(err => console.error(err));
+    }, [user?.id, customAvatar]);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
-            const url = URL.createObjectURL(file);
-            setProfilePic(url);
+        if (!file) return;
+
+        // Compression Logic to prevent localStorage limits
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 400;
+                const MAX_HEIGHT = 400;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx?.drawImage(img, 0, 0, width, height);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.7); // Compress to 70% quality
+                setProfilePic(dataUrl);
+                setCustomAvatar(dataUrl);
+            };
+            img.src = event.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleSaveProfile = async () => {
+        try {
+            await axios.put(`${BASE_URL}/api/v1/users/me`, editForm, {
+                headers: { Authorization: `Bearer ${user?.id}` }
+            });
+            setProfile(editForm);
+            setIsEditing(false);
+            alert("Settings updated!");
+        } catch (e) {
+            alert("Failed to save changes.");
         }
     };
 
+    const handleBreakSync = async () => {
+        if (!confirm("Are you sure you want to break your romantic sync?! This cannot be undone.")) return;
+
+        try {
+            await axios.delete(`${BASE_URL}/api/v1/users/me/relationship`, {
+                headers: { Authorization: `Bearer ${user?.id}` }
+            });
+
+            // Send Realtime Notification
+            sendWS({ type: 'break_sync', partnerId: partner?.id, fromName: profile?.display_name });
+
+            useSyncStore.getState().setPartner(null);
+            alert("Sync Broken. Your connection has been severed.");
+        } catch (e) {
+            alert("Failed to break relationship. Please try again.");
+            console.error(e);
+        }
+    };
+
+    const handleLogout = () => {
+        useSyncStore.getState().setUser(null);
+        navigate('/');
+    };
+
     return (
-        <div className="min-h-screen bg-[#1E1E2C] text-white pb-12 relative overflow-hidden font-sans">
-            {/* Ambient Background Glows */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-80 bg-gradient-to-b from-[#FF3366]/20 to-transparent pointer-events-none blur-3xl" />
-            <div className="absolute top-40 right-0 w-64 h-64 bg-[#00D68F]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="min-h-screen bg-cream text-romantic pb-32">
 
-            <div className="relative z-10 px-6 pt-6">
-                {/* Header / Avatar */}
-                <div className="flex flex-col items-center mt-2 mb-10 group relative">
-                    <label className="relative mb-4 cursor-pointer block">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-[#FF3366] to-[#FFB000] rounded-full blur-lg opacity-40 animate-pulse scale-110 group-hover:opacity-80 transition-opacity duration-300"></div>
-                        <div className="relative w-36 h-36 rounded-full border-[3px] border-[#2C2C3E] object-cover shadow-[0_10px_35px_rgba(255,51,102,0.4)] group-hover:scale-105 transition-transform duration-500 ease-out overflow-hidden">
-                            <img
-                                src={profilePic}
-                                className="w-full h-full object-cover"
-                                alt="Profile"
-                            />
-                            {/* Overlay */}
-                            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <Camera className="text-white mb-1" size={28} />
-                                <span className="text-white text-xs font-bold tracking-wider">CHANGE</span>
-                            </div>
-                        </div>
-                        <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                    </label>
-                    <h1 className="text-4xl font-black tracking-tight text-white drop-shadow-md">Shubham</h1>
-                    <div className="flex items-center gap-2 mt-3 bg-white/5 px-5 py-2.5 rounded-full border border-white/10 shadow-lg backdrop-blur-xl">
-                        <Heart size={16} className="text-[#FF3366] fill-current animate-pulse drop-shadow-[0_0_8px_rgba(255,51,102,0.8)]" />
-                        <span className="text-sm font-semibold tracking-wide text-gray-200">Together since Oct 2021</span>
+            {/* Romantic Profile Header */}
+            <div className="bg-mesh-romantic pt-16 pb-28 px-8 rounded-b-[70px] shadow-2xl relative overflow-hidden">
+                <div className="flex items-center justify-between mb-12 relative z-10">
+                    <Link to="/" className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/20">
+                        <ChevronLeft size={24} />
+                    </Link>
+                    <div className="flex gap-3">
+                        <Link to="/admin" className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.4)] hover:bg-white/40 transition-all">
+                            <Database size={20} />
+                        </Link>
+                        <button className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/20">
+                            <Settings size={20} />
+                        </button>
                     </div>
                 </div>
 
-                {/* Relationship Snapshot Card */}
-                <div className="bg-gradient-to-br from-[#2C2C3E] to-[#252535] border border-white/5 rounded-[32px] p-6 mb-8 shadow-2xl relative overflow-hidden group">
-                    <div className="absolute -right-10 -top-10 w-40 h-40 bg-gradient-to-br from-[#FF3366]/20 to-[#FFB000]/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-                    <h2 className="text-[#FF3366] font-black text-[11px] uppercase tracking-[0.3em] mb-6 opacity-90 drop-shadow-sm">Relationship Snapshot</h2>
-
-                    <div className="flex justify-between items-center mb-8 relative z-10">
-                        <div>
-                            <p className="text-gray-400 text-xs font-bold tracking-wider uppercase mb-1">Sync Score</p>
-                            <p className="text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-400 drop-shadow-sm">94<span className="text-3xl text-gray-500">%</span></p>
-                        </div>
-                        {/* Heart Match Indicator */}
-                        <div className="relative w-24 h-24 rounded-full bg-[#1E1E2C] flex items-center justify-center shadow-[inset_0_4px_10px_rgba(0,0,0,0.5)] border border-white/5">
-                            <svg className="absolute w-full h-full -rotate-90 drop-shadow-[0_0_8px_rgba(255,51,102,0.5)]">
-                                <circle cx="48" cy="48" r="42" stroke="#2C2C3E" strokeWidth="6" fill="none" />
-                                <circle cx="48" cy="48" r="42" stroke="url(#neonGrad)" strokeWidth="8" fill="none" strokeDasharray="264" strokeDashoffset="15" strokeLinecap="round" />
-                                <defs>
-                                    <linearGradient id="neonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stopColor="#FF3366" />
-                                        <stop offset="100%" stopColor="#FFB000" />
-                                    </linearGradient>
-                                </defs>
-                            </svg>
-                            <Heart size={36} className="text-[#FF3366] fill-[#FF3366] drop-shadow-[0_0_12px_rgba(255,51,102,0.8)]" />
+                <div className="flex flex-col items-center relative z-10">
+                    <div className="relative group">
+                        <div className="w-40 h-40 rounded-full p-2 bg-white shadow-2xl relative">
+                            <div className="w-full h-full rounded-full overflow-hidden border-4 border-rose-50 shadow-inner">
+                                <img
+                                    src={profilePic || getAvatarUrl(user?.id)}
+                                    alt="Profile"
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => { (e.target as HTMLImageElement).src = getAvatarUrl(user?.id); }}
+                                />
+                            </div>
+                            <label className="absolute bottom-1 right-1 w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center shadow-2xl cursor-pointer hover:scale-110 active:scale-95 transition-all border-4 border-white">
+                                <Camera size={20} />
+                                <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                            </label>
                         </div>
                     </div>
 
-                    <div className="flex gap-4 relative z-10">
-                        <div className="flex-1 bg-white/5 rounded-2xl p-4 flex items-center gap-4 border border-white/5 shadow-lg hover:-translate-y-1 hover:bg-white/10 transition-all duration-300">
-                            <div className="bg-gradient-to-br from-[#FFB000]/20 to-[#FF3366]/10 p-3 rounded-xl shadow-[inset_0_0_10px_rgba(255,176,0,0.2)] text-[#FFB000]">
-                                <Flame size={22} className="fill-[#FFB000]/80 drop-shadow-[0_0_5px_rgba(255,176,0,0.8)]" />
-                            </div>
-                            <div>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Streak</p>
-                                <p className="font-black text-white text-lg tracking-tight">12 Days</p>
-                            </div>
+                    <h1 className="text-4xl font-black mt-6 tracking-tighter text-white italic">{profile?.display_name || "Lover"}</h1>
+                    <p className="text-white/60 text-xs font-black uppercase tracking-[0.3em] mt-2">Shared Frequency Hub</p>
+                </div>
+            </div>
+
+            <div className="px-8 -mt-10 space-y-10 relative z-20">
+
+                {/* Stats Cards */}
+                <div className="grid grid-cols-2 gap-6">
+                    <div className="premium-card p-8 flex flex-col items-center group">
+                        <div className="text-primary mb-4 animate-heartbeat">
+                            <Heart size={32} fill="currentColor" />
                         </div>
-                        <div className="flex-1 bg-white/5 rounded-2xl p-4 flex items-center gap-4 border border-white/5 shadow-lg hover:-translate-y-1 hover:bg-white/10 transition-all duration-300">
-                            <div className="bg-gradient-to-br from-[#8A2BE2]/20 to-[#FF3366]/10 p-3 rounded-xl shadow-[inset_0_0_10px_rgba(138,43,226,0.2)] text-[#8A2BE2]">
-                                <CalendarHeart size={22} className="drop-shadow-[0_0_5px_rgba(138,43,226,0.8)]" />
-                            </div>
-                            <div>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Anniv</p>
-                                <p className="font-black text-white text-lg tracking-tight">45 Days</p>
-                            </div>
+                        <h4 className="text-4xl font-black text-romantic tracking-tighter leading-none">0</h4>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-romantic/30 mt-1">Sync Score</p>
+                    </div>
+
+                    <div className="premium-card p-8 flex flex-col items-center group">
+                        <div className="text-rose-900 mb-4 scale-110">
+                            <Award size={32} />
                         </div>
+                        <h4 className="text-4xl font-black text-romantic tracking-tighter leading-none">Pro</h4>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-romantic/30 mt-1">Status</p>
                     </div>
                 </div>
 
-                {/* Quick Actions */}
-                <h2 className="text-gray-500 font-black text-[10px] uppercase tracking-[0.2em] mb-4 ml-2">Intimate Actions</h2>
-                <div className="grid grid-cols-2 gap-4 mb-10">
-                    {[
-                        { icon: HeartHandshake, title: "My Love Language", gradient: "from-[#FF3366] to-[#ffaa00]", color: "text-white", path: "/love-language", shadow: "shadow-[#FF3366]/40" },
-                        { icon: Smile, title: "My Current Mood", gradient: "from-[#00D68F] to-[#00b377]", color: "text-white", path: "/mood", shadow: "shadow-[#00D68F]/40" },
-                        { icon: BookHeart, title: "Reflection Journal", gradient: "from-[#8A2BE2] to-[#b366ff]", color: "text-white", path: "/journal", shadow: "shadow-[#8A2BE2]/40" },
-                        { icon: Target, title: "Growth Goals", gradient: "from-[#FFB000] to-[#ff8c00]", color: "text-white", path: "/goals", shadow: "shadow-[#FFB000]/40" }
-                    ].map((btn, i) => (
-                        <Link
-                            to={btn.path}
-                            key={i}
-                            className={`bg-gradient-to-br ${btn.gradient} p-[1px] rounded-[24px] group overflow-hidden shadow-lg ${btn.shadow} hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 active:scale-95`}
-                        >
-                            <div className="bg-[#2C2C3E]/95 backdrop-blur-xl rounded-[23px] p-5 h-full flex flex-col items-start gap-4 transition-colors group-hover:bg-[#2C2C3E]/80">
-                                <div className={`p-3 rounded-2xl bg-gradient-to-br ${btn.gradient} text-white shadow-lg`}>
-                                    <btn.icon size={26} strokeWidth={2.5} />
+                {/* Information Section */}
+                <div>
+                    <div className="flex justify-between items-center mb-6 px-2">
+                        <h2 className="section-header text-romantic text-2xl">Profile Link</h2>
+                        {!isEditing ? (
+                            <button onClick={() => setIsEditing(true)} className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-primary shadow-sm hover:scale-110 transition-transform">
+                                <Edit2 size={16} />
+                            </button>
+                        ) : (
+                            <button onClick={handleSaveProfile} className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600 shadow-sm hover:scale-110 transition-transform">
+                                <Check size={16} />
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="space-y-4">
+                        {[
+                            { key: 'love_language', label: "Language", value: profile?.love_language || "Not set", icon: HeartHandshake, col: "bg-rose-50 text-rose-500" },
+                            { key: 'attachment_style', label: "Rhythm", value: profile?.attachment_style || "Not set", icon: Shield, col: "bg-orange-50 text-orange-600" }
+                        ].map((item, i) => (
+                            <div key={i} className="premium-card p-6 flex items-center gap-6">
+                                <div className={`w-14 h-14 rounded-2xl ${item.col} flex items-center justify-center shadow-inner`}>
+                                    <item.icon size={24} />
                                 </div>
-                                <span className="font-black text-sm text-gray-100 leading-tight tracking-wide">{btn.title}</span>
+                                <div className="flex-1">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-romantic/30 mb-0.5">{item.label}</p>
+                                    {isEditing ? (
+                                        <input
+                                            value={editForm[item.key] || ''}
+                                            onChange={e => setEditForm({ ...editForm, [item.key]: e.target.value })}
+                                            className="w-full bg-cream rounded-lg px-2 py-1 font-bold text-romantic outline-none border-b-2 border-primary/20"
+                                        />
+                                    ) : (
+                                        <span className="text-lg font-black text-romantic/80">{item.value}</span>
+                                    )}
+                                </div>
+                                <ArrowRight size={18} className="text-romantic/10" />
                             </div>
-                        </Link>
-                    ))}
+                        ))}
+                    </div>
                 </div>
 
-                {/* About Me Section - Pill Shapes */}
-                <h2 className="text-gray-500 font-black text-[10px] uppercase tracking-[0.2em] mb-4 ml-2">About Me</h2>
-                <div className="space-y-3 mb-10">
-                    {[
-                        { label: "Nickname", value: "Shubby", icon: Heart },
-                        { label: "Birthday", value: "Nov 12", icon: CalendarHeart },
-                        { label: "Love Language", value: "Quality Time", icon: HeartHandshake },
-                        { label: "Attachment Style", value: "Secure", icon: Shield },
-                        { label: "Fav Memory", value: "Our first roadtrip", icon: ImageIcon },
-                    ].map((item, i) => (
-                        <div key={i} className="group bg-[#2C2C3E]/80 border border-white/5 rounded-full px-6 py-4 flex flex-row items-center justify-between backdrop-blur-md shadow-lg hover:bg-white/10 hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] transition-all cursor-pointer hover:scale-[1.01] active:scale-95">
-                            <div className="flex items-center gap-3">
-                                <div className="text-gray-400 group-hover:text-[#FF3366] transition-colors"><item.icon size={18} /></div>
-                                <span className="text-gray-400 text-xs font-bold tracking-widest uppercase">{item.label}</span>
-                            </div>
-                            <span className="text-white font-black text-right truncate pl-4">{item.value}</span>
+                {/* Partner Sync Hub */}
+                <div className="premium-card p-10 bg-white border-2 border-rose-50">
+                    <h3 className="text-2xl font-black mb-6 tracking-tight text-romantic">Sync Your Partner</h3>
+                    <p className="text-xs font-bold text-romantic/40 mb-3 tracking-widest uppercase">Your Exclusive Key</p>
+                    <div className="bg-rose-50 rounded-[30px] p-6 flex items-center gap-4 mb-4">
+                        <span className="flex-1 text-3xl font-black tracking-[0.2em] text-primary">{profile?.invite_code || "••••••"}</span>
+                        <button
+                            onClick={() => { navigator.clipboard.writeText(profile?.invite_code); alert('Key Copied! 💘'); }}
+                            className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-primary shadow-lg hover:scale-110 transition-transform"
+                        >
+                            <Copy size={20} />
+                        </button>
+                    </div>
+                    {!partner ? (
+                        <div className="mt-10 space-y-4">
+                            <input
+                                id="syncInput"
+                                placeholder="Enter their key..."
+                                className="w-full bg-cream rounded-[24px] py-5 px-8 font-black text-romantic outline-none border-2 border-transparent focus:border-primary/20 transition-all"
+                            />
+                            <button
+                                onClick={() => {
+                                    const code = (document.getElementById('syncInput') as HTMLInputElement).value;
+                                    axios.post(`${BASE_URL}/api/v1/users/sync-couple`, { invite_code: code }, { headers: { Authorization: `Bearer ${user?.id}` } })
+                                        .then(res => {
+                                            if (res.data?.partner) {
+                                                useSyncStore.getState().setPartner(res.data.partner);
+                                                alert(" Hearts Synced! ✨");
+                                                window.location.reload();
+                                            }
+                                        }).catch(e => alert(e.response?.data?.message || 'Synch failed.'));
+                                }}
+                                className="w-full bg-romantic text-white py-6 rounded-[24px] font-black text-xs uppercase tracking-[0.4em] shadow-xl hover:bg-primary transition-all"
+                            >
+                                Integrate Hearts
+                            </button>
                         </div>
-                    ))}
-                </div>
-
-                {/* Our Memories Scroll */}
-                <div className="flex items-center justify-between mb-4 ml-2 mr-2">
-                    <h2 className="text-gray-500 font-black text-[10px] uppercase tracking-[0.2em]">Our Memories</h2>
-                    <Link to="/memories" className="text-[#FF3366] text-[10px] font-black uppercase tracking-widest hover:text-white transition-colors flex items-center">See All <ChevronRight size={14} /></Link>
-                </div>
-                <div className="flex gap-4 overflow-x-auto pb-6 snap-x snap-mandatory pr-6 pl-2" style={{ scrollbarWidth: 'none' }}>
-                    {[1, 2, 3].map((img, i) => (
-                        <Link to="/memories" key={i} className="min-w-[200px] h-56 rounded-[32px] overflow-hidden snap-center relative border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)] group hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(255,51,102,0.3)] transition-all duration-300">
-                            <img src={`https://picsum.photos/400/500?random=${i + 15}`} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" alt="Memory" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#1E1E2C] via-transparent to-transparent opacity-90"></div>
-                            <div className="absolute bottom-0 w-full p-5">
-                                <p className="text-white text-lg font-black tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{['Bali Trip', 'Our 1st Anniv', 'Cozy Sunday'][i]}</p>
-                                <p className="text-[#FFB000] text-xs font-bold mt-1 tracking-wider uppercase">— 2023</p>
+                    ) : (
+                        <div className="mt-10 space-y-4">
+                            <div className="bg-cream rounded-[24px] p-6 text-center border-2 border-rose-50 border-dashed">
+                                <Heart size={24} className="text-primary mx-auto mb-3 animate-pulse" fill="currentColor" />
+                                <p className="text-sm font-black text-romantic/60 mb-1">Currently Synced With</p>
+                                <p className="text-2xl font-black text-romantic tracking-tight">{(partner as any).display_name || partner.email}</p>
                             </div>
-                        </Link>
-                    ))}
+                            <button
+                                onClick={handleBreakSync}
+                                className="w-full bg-rose-50 text-rose-500 py-6 rounded-[24px] font-black text-xs uppercase tracking-[0.2em] shadow-sm hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all border border-rose-100"
+                            >
+                                Break Relationship Sync
+                            </button>
+                        </div>
+                    )}
                 </div>
 
-                {/* Minimal Settings */}
-                <div className="bg-[#2C2C3E]/80 border border-white/5 rounded-[32px] overflow-hidden backdrop-blur-md shadow-xl mb-8 mt-4">
-                    {[
-                        { icon: Settings, label: "Account Overview", color: "text-[#00D68F]", bg: "bg-[#00D68F]/10", path: "/settings/account" },
-                        { icon: Shield, label: "Privacy Details", color: "text-[#FFB000]", bg: "bg-[#FFB000]/10", path: "/settings/privacy" },
-                        { icon: Bell, label: "Notification Rules", color: "text-[#8A2BE2]", bg: "bg-[#8A2BE2]/10", path: "/settings/notifications" },
-                        { icon: Heart, label: "Relationship Settings", color: "text-[#FF3366]", bg: "bg-[#FF3366]/10", path: "/settings/relationship" },
-                    ].map((item, i) => (
-                        <Link to={item.path} key={i} className="w-full group flex items-center justify-between p-5 border-b border-white/5 hover:bg-white/5 transition-all active:bg-white/10">
-                            <div className="flex items-center gap-4">
-                                <div className={`${item.color} ${item.bg} p-2.5 rounded-full group-hover:scale-110 transition-transform`}><item.icon size={20} /></div>
-                                <span className="text-white font-bold tracking-wide">{item.label}</span>
-                            </div>
-                            <ChevronRight size={20} className="text-gray-500 group-hover:text-white transition-colors group-hover:translate-x-1" />
-                        </Link>
-                    ))}
-                    <button onClick={handleLogout} className="w-full group flex items-center gap-4 p-5 hover:bg-[#FF3366]/10 transition-all active:bg-[#FF3366]/20">
-                        <div className="text-[#FF3366] bg-[#FF3366]/10 p-2.5 rounded-full group-hover:scale-110 transition-transform"><LogOut size={20} /></div>
-                        <span className="font-black text-[#FF3366] tracking-widest uppercase text-sm">Log Out</span>
-                    </button>
-                </div>
-
+                <button
+                    onClick={handleLogout}
+                    className="w-full py-6 rounded-[32px] bg-rose-50 text-rose-300 font-black text-[10px] uppercase tracking-[0.4em] hover:text-rose-500 transition-all border border-rose-100/50"
+                >
+                    Disconnect Frequency
+                </button>
             </div>
         </div>
     );
