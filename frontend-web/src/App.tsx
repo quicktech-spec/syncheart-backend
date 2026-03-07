@@ -88,9 +88,9 @@ const BottomNav = () => {
 
 const Layout = () => {
   return (
-    <div className="min-h-[100dvh] bg-[#09090B] w-full max-w-md mx-auto relative shadow-[0_30px_100px_rgba(0,0,0,1)] flex flex-col border-x border-white/10 overflow-hidden">
+    <div style={{ backgroundColor: '#09090B', minHeight: '100dvh', width: '100%', maxWidth: '448px', margin: '0 auto', position: 'relative', display: 'flex', flexDirection: 'column', borderLeft: '1px solid rgba(255,255,255,0.05)', borderRight: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', boxShadow: '0 0 100px rgba(0,0,0,1)' }}>
       <TopNav />
-      <div className="flex-1 pb-28 relative overflow-y-auto">
+      <div style={{ flex: 1, paddingBottom: '112px', position: 'relative', overflowY: 'auto' }}>
         <Outlet />
       </div>
       <BottomNav />

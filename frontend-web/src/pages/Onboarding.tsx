@@ -90,7 +90,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
                                 opacity: i === step ? 1 : 0.2,
                                 backgroundColor: i === step ? '#FF2A5F' : 'rgba(255,255,255,0.2)'
                             }}
-                            style={{ h: '8px', borderRadius: '100px', height: '8px' }}
+                            style={{ height: '8px', borderRadius: '100px' }}
                         />
                     ))}
                 </div>
