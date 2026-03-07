@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSyncStore } from '../store';
-import { Heart, MessageCircle, Sparkles, Calendar, ArrowRight, Activity, Flame, HeartHandshake, MapPin, Navigation } from 'lucide-react';
+import { Heart, MessageCircle, Sparkles, Calendar, Activity, Flame, HeartHandshake, MapPin, Navigation } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
@@ -94,7 +94,7 @@ export default function Dashboard() {
                     style={{ padding: '32px', background: 'linear-gradient(135deg, rgba(30,30,35,0.8) 0%, rgba(15,15,20,0.9) 100%)', position: 'relative', overflow: 'hidden' }}
                 >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '48px' }}>
-                        <div style={{ width: '64px', height: '64px', backgroundColor: 'rgba(255,42,95,0.2)', border: '1px solid rgba(255,42,95,0.3)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyCenter: 'center', color: '#FF2A5F' }} className="flex justify-center">
+                        <div style={{ width: '64px', height: '64px', backgroundColor: 'rgba(255,42,95,0.2)', border: '1px solid rgba(255,42,95,0.3)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FF2A5F' }} className="flex justify-center">
                             <Heart size={32} className="animate-heartbeat" fill="currentColor" />
                         </div>
                         <div style={{ textAlign: 'right' }}>
