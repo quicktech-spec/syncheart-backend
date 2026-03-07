@@ -4,17 +4,17 @@ import { Heart, Lock, Sparkles, ArrowRight } from 'lucide-react';
 
 const slides = [
     {
-        icon: <Heart size={100} className="text-primary animate-heartbeat" fill="currentColor" />,
+        icon: <Heart size={100} style={{ color: '#FF2A5F' }} className="animate-heartbeat" fill="currentColor" />,
         title: "Conscious Hearts.",
         description: "Track your relationship DNA over time and unlock a deeper, more intimate emotional connection."
     },
     {
-        icon: <Sparkles size={100} className="text-accent animate-float" fill="currentColor" />,
+        icon: <Sparkles size={100} style={{ color: '#E5A93C' }} className="animate-float" fill="currentColor" />,
         title: "Micro-Moments.",
         description: "Small nudges, daily check-ins, and shared journaling designed to nurture your bond effortlessly."
     },
     {
-        icon: <Lock size={100} className="text-romantic animate-float" fill="currentColor" />,
+        icon: <Lock size={100} style={{ color: '#FF7096' }} className="animate-float" fill="currentColor" />,
         title: "Shared Sanctum.",
         description: "All your shared memories and conflict resolution notes are protected by AES-256 encryption."
     }
@@ -32,26 +32,31 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-cream flex flex-col items-center justify-center p-10 z-50 text-romantic overflow-hidden">
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: '#09090B', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', zIndex: 50, color: 'white', overflow: 'hidden' }}>
             {/* Ambient Background Glows */}
             <AnimatePresence mode="wait">
                 <motion.div
                     key={step}
                     initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 0.3, scale: 1 }}
+                    animate={{ opacity: 0.2, scale: 1 }}
                     exit={{ opacity: 0, scale: 1.2 }}
-                    className="absolute w-[600px] h-[600px] rounded-full blur-[150px] pointer-events-none"
                     style={{
+                        position: 'absolute',
+                        width: '600px',
+                        height: '600px',
+                        borderRadius: '50%',
+                        filter: 'blur(150px)',
+                        pointerEvents: 'none',
                         background: [
-                            'radial-gradient(circle, #FF3366 0%, transparent 70%)',
-                            'radial-gradient(circle, #FFB000 0%, transparent 70%)',
-                            'radial-gradient(circle, #63001A 0%, transparent 70%)'
+                            'radial-gradient(circle, #FF2A5F 0%, transparent 70%)',
+                            'radial-gradient(circle, #E5A93C 0%, transparent 70%)',
+                            'radial-gradient(circle, #FF7096 0%, transparent 70%)'
                         ][step]
                     }}
                 />
             </AnimatePresence>
 
-            <div className="flex-1 flex flex-col items-center justify-center w-full max-w-sm relative z-10">
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', maxWidth: '360px', position: 'relative', zIndex: 10 }}>
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={step}
@@ -59,33 +64,33 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
                         animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
                         exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
                         transition={{ duration: 0.8 }}
-                        className="flex flex-col items-center text-center"
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}
                     >
-                        <div className="mb-14">
+                        <div style={{ marginBottom: '56px' }}>
                             {slides[step].icon}
                         </div>
-                        <h1 className="section-header text-romantic mb-6">
+                        <h1 style={{ fontSize: '36px', fontFamily: 'serif', fontStyle: 'italic', marginBottom: '24px', letterSpacing: '-0.02em' }}>
                             {slides[step].title}
                         </h1>
-                        <p className="text-romantic/60 font-medium px-8 leading-relaxed text-lg italic">
+                        <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 500, padding: '0 32px', lineHeight: 1.6, fontSize: '18px', fontStyle: 'italic' }}>
                             {slides[step].description}
                         </p>
                     </motion.div>
                 </AnimatePresence>
             </div>
 
-            <div className="w-full max-w-sm mb-16 flex flex-col items-center relative z-10">
+            <div style={{ width: '100%', maxWidth: '360px', marginBottom: '64px', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 10 }}>
                 {/* Dots indicator */}
-                <div className="flex gap-4 mb-14">
+                <div style={{ display: 'flex', gap: '16px', marginBottom: '56px' }}>
                     {slides.map((_, i) => (
                         <motion.div
                             key={i}
                             animate={{
                                 width: i === step ? 48 : 12,
                                 opacity: i === step ? 1 : 0.2,
-                                backgroundColor: i === step ? '#FF3366' : '#3D0014'
+                                backgroundColor: i === step ? '#FF2A5F' : 'rgba(255,255,255,0.2)'
                             }}
-                            className="h-2 rounded-full transition-all duration-500"
+                            style={{ h: '8px', borderRadius: '100px', height: '8px' }}
                         />
                     ))}
                 </div>
@@ -94,7 +99,24 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={nextStep}
-                    className="w-full bg-romantic text-white py-6 rounded-[30px] font-black text-xs tracking-[0.4em] uppercase shadow-2xl shadow-rose-900/20 flex items-center justify-center gap-4 transition-all"
+                    style={{
+                        width: '100%',
+                        backgroundColor: '#FF2A5F',
+                        color: 'white',
+                        padding: '24px',
+                        borderRadius: '30px',
+                        fontWeight: 900,
+                        fontSize: '12px',
+                        letterSpacing: '0.4em',
+                        textTransform: 'uppercase',
+                        border: 'none',
+                        boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '16px',
+                        cursor: 'pointer'
+                    }}
                 >
                     {step === slides.length - 1 ? "Enter Heart" : "Synchronize"} <ArrowRight size={20} />
                 </motion.button>

@@ -38,7 +38,7 @@ const TopNav = () => {
   const customAvatar = useSyncStore(s => s.customAvatar);
 
   return (
-    <div className="sticky top-0 z-[100] px-6 py-5 flex items-center justify-between bg-[#09090B]/80 backdrop-blur-2xl border-b border-white/5">
+    <div className="sticky top-0 z-[100] px-6 py-5 flex items-center justify-between bg-[#09090B] border-b border-white/5">
       <Link to="/" className="flex items-center gap-3 hover:scale-105 transition-transform active:scale-95 group">
         <AppLogo />
         <span className="font-serif italic text-white tracking-widest text-xl group-hover:text-primary transition-colors uppercase">Synch</span>
@@ -64,7 +64,7 @@ const BottomNav = () => {
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[380px] z-[100]">
-      <div className="bg-[#18181B]/80 backdrop-blur-3xl border border-white/10 p-2 rounded-[32px] flex justify-around shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+      <div className="bg-[#18181B] border border-white/10 p-2 rounded-[32px] flex justify-around shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
         <Link to="/" className={`p-3.5 rounded-[24px] transition-all duration-300 ${location.pathname === '/' ? 'bg-white/10 text-primary shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] scale-110' : 'text-white/40 hover:text-white/80'}`}>
           <Home size={20} strokeWidth={2.5} />
         </Link>
@@ -88,7 +88,7 @@ const BottomNav = () => {
 
 const Layout = () => {
   return (
-    <div className="min-h-[100dvh] bg-[#09090B] w-full max-w-md mx-auto relative shadow-[0_0_100px_rgba(0,0,0,1)] flex flex-col border-x border-white/5 overflow-hidden">
+    <div className="min-h-[100dvh] bg-[#09090B] w-full max-w-md mx-auto relative shadow-[0_30px_100px_rgba(0,0,0,1)] flex flex-col border-x border-white/10 overflow-hidden">
       <TopNav />
       <div className="flex-1 pb-28 relative overflow-y-auto">
         <Outlet />
@@ -152,7 +152,7 @@ function App() {
   }
 
   return (
-    <div className="bg-black min-h-screen text-white flex justify-center">
+    <div className="bg-[#09090B] min-h-screen text-white flex justify-center">
       <BrowserRouter>
         <Routes>
           {!user ? (

@@ -5,43 +5,36 @@
   --color-primary: #FF2A5F;
   --color-secondary: #FF7096;
   --color-accent: #E5A93C;
-  --color-dark: #09090B;
+  --color-dark: #090911;
   --color-romantic: #1A1A1F;
-  --color-cream: #09090B;
-  --color-card: rgba(24, 24, 27, 0.8);
-  --font-outfit: 'Outfit', sans-serif;
-  --font-serif: 'Playfair Display', serif;
 }
 
 :root {
-  --glass: rgba(15, 15, 20, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --primary-glow: radial-gradient(circle, rgba(255, 42, 95, 0.2) 0%, transparent 60%);
+  background-color: #09090B !important;
+  color-scheme: dark;
 }
 
+html,
 body {
   background-color: #09090B !important;
   color: #FFFFFF !important;
-  font-family: 'Outfit', sans-serif;
   margin: 0;
   padding: 0;
+  font-family: 'Outfit', sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Force Dark Everywhere */
+* {
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .luxury-box {
-  background: rgba(30, 30, 35, 0.7) !important;
+  background: rgba(30, 30, 35, 0.8) !important;
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 28px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-}
-
-.bg-mesh-romantic {
-  background-color: #09090B !important;
-  background-image:
-    radial-gradient(at 0% 0%, rgba(255, 42, 95, 0.2) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(229, 169, 60, 0.1) 0px, transparent 50%),
-    radial-gradient(at 50% 100%, rgba(255, 112, 150, 0.1) 0px, transparent 50%) !important;
+  border-radius: 32px;
 }
 
 @keyframes heartbeat {
