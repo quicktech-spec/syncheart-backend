@@ -1,37 +1,58 @@
+// Real-time sync provider using Socket.IO
+// Connects to the production backend WebSocket gateway
+
 type Listener = (data: any) => void;
 const listeners: Listener[] = [];
-let ws: WebSocket | null = null;
+
+let socket: any = null;
 let reconnectTimer: any = null;
 
-const getWSUrl = () => {
-    const apiBase = import.meta.env.VITE_API_URL || 'syncheart-backend-production.up.railway.app';
-    const cleanUrl = apiBase.replace('https://', '').replace('http://', '');
-    return (apiBase.includes('localhost') ? 'ws://' : 'wss://') + cleanUrl;
+const getWsUrl = () => {
+    const api = import.meta.env.VITE_API_URL || 'https://syncheart-backend-production.up.railway.app';
+    return api; // Socket.IO uses the same base URL
 };
 
 const connectWS = () => {
-    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+    if (socket && socket.connected) return;
 
-    ws = new WebSocket(getWSUrl());
-
-    ws.onmessage = (e) => {
-        try {
-            const data = JSON.parse(e.data);
-            listeners.forEach(l => l(data));
-        } catch (err) {
-            console.error(err);
+    // Dynamically import socket.io-client to avoid bundle issues
+    import('socket.io-client').then(({ io }) => {
+        if (socket) {
+            socket.disconnect();
         }
-    };
+        socket = io(getWsUrl(), {
+            transports: ['websocket', 'polling'],
+            reconnection: true,
+            reconnectionAttempts: Infinity,
+            reconnectionDelay: 2000,
+        });
 
-    ws.onclose = () => {
-        clearTimeout(reconnectTimer);
-        reconnectTimer = setTimeout(connectWS, 2000);
-    };
+        socket.on('connect', () => {
+            console.log('🔗 SynchHeart WS connected');
+            // Register self
+            const store = (window as any).__SYNCHEART_STORE__;
+            if (store?.profile?.id) {
+                socket.emit('register', { userId: store.profile.id });
+            }
+        });
 
-    ws.onerror = () => ws?.close();
+        socket.on('message', (data: any) => {
+            listeners.forEach(l => l(data));
+        });
+
+        socket.on('disconnect', () => {
+            console.log('WS disconnected');
+        });
+
+        socket.on('connect_error', (err: any) => {
+            console.warn('WS connect error:', err.message);
+        });
+    }).catch(err => {
+        console.warn('socket.io-client not available, WS disabled:', err);
+    });
 };
 
-// Initialize connection
+// Initialize
 connectWS();
 
 export const subscribeToWS = (callback: Listener) => {
@@ -39,22 +60,27 @@ export const subscribeToWS = (callback: Listener) => {
     return () => {
         const index = listeners.indexOf(callback);
         if (index > -1) listeners.splice(index, 1);
-    }
+    };
 };
 
 export const sendWS = (data: any) => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify(data));
+    if (socket && socket.connected) {
+        socket.emit('message', data);
     } else {
-        // Queue the message or try reconnecting
+        // Queue and retry
         connectWS();
         const checkReady = setInterval(() => {
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify(data));
+            if (socket && socket.connected) {
+                socket.emit('message', data);
                 clearInterval(checkReady);
             }
-        }, 100);
-        // Timeout queue
+        }, 200);
         setTimeout(() => clearInterval(checkReady), 5000);
+    }
+};
+
+export const registerUserWS = (userId: string) => {
+    if (socket && socket.connected) {
+        socket.emit('register', { userId });
     }
 };

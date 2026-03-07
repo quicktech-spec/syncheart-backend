@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, Link, useLocation } from 'react-router-dom';
-import { subscribeToWS } from './utils/wsProvider';
+import { subscribeToWS, registerUserWS } from './utils/wsProvider';
 import { Home, MessageCircleHeart, Gamepad2, User, BrainCircuit } from 'lucide-react';
 import Wellness from './pages/Wellness';
 import Sensual from './pages/Sensual';
@@ -120,7 +120,13 @@ function App() {
       const headers = { Authorization: `Bearer ${user.id}` };
 
       axios.get(`${BASE_URL}/api/v1/users/me`, { headers })
-        .then(res => setProfile(res.data))
+        .then(res => {
+          setProfile(res.data);
+          // Register with WebSocket gateway using real user UUID
+          if (res.data?.id) {
+            registerUserWS(res.data.id);
+          }
+        })
         .catch(() => { });
 
       axios.get(`${BASE_URL}/api/v1/users/me/relationship`, { headers })

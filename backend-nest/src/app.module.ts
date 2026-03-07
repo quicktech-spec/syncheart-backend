@@ -10,6 +10,7 @@ import { ProgramsModule } from './programs/programs.module';
 import { UsersModule } from './users/users.module';
 
 import { DebugController } from './debug.controller';
+import { SyncGateway } from './sync.gateway';
 
 @Module({
     imports: [
@@ -22,6 +23,6 @@ import { DebugController } from './debug.controller';
         UsersModule,
     ],
     controllers: [AppController, DebugController],
-    providers: [],
+    providers: [SyncGateway],
 })
 export class AppModule { }
