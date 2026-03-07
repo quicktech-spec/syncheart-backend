@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import "tailwindcss";
 
 @theme {
   --color-primary: #FF2A5F;
@@ -17,40 +17,23 @@
   --glass: rgba(15, 15, 20, 0.6);
   --glass-border: rgba(255, 255, 255, 0.08);
   --primary-glow: radial-gradient(circle, rgba(255, 42, 95, 0.2) 0%, transparent 60%);
-  background-color: #09090B !important;
 }
 
 body {
   background-color: #09090B !important;
   color: #FFFFFF !important;
-  font-family: var(--font-outfit);
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
+  font-family: 'Outfit', sans-serif;
   margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
-/* Luxury Box - Forced Dark */
 .luxury-box {
-  background: rgba(30, 30, 35, 0.6) !important;
+  background: rgba(30, 30, 35, 0.7) !important;
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  transition: all 0.3s ease;
-}
-
-.luxury-box:hover {
-  border-color: #FF2A5F !important;
-  background: rgba(40, 40, 45, 0.8) !important;
-  transform: translateY(-2px);
-}
-
-.glass {
-  background: rgba(20, 20, 20, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 .bg-mesh-romantic {
@@ -59,10 +42,6 @@ body {
     radial-gradient(at 0% 0%, rgba(255, 42, 95, 0.2) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(229, 169, 60, 0.1) 0px, transparent 50%),
     radial-gradient(at 50% 100%, rgba(255, 112, 150, 0.1) 0px, transparent 50%) !important;
-}
-
-.animate-heartbeat {
-  animation: heartbeat 2s infinite;
 }
 
 @keyframes heartbeat {
@@ -87,10 +66,8 @@ body {
   }
 }
 
-.text-gradient {
-  background: linear-gradient(135deg, #FF2A5F 0%, #FF7096 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.animate-heartbeat {
+  animation: heartbeat 2s infinite;
 }
 
 ::-webkit-scrollbar {
