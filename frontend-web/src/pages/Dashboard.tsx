@@ -51,9 +51,9 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-cream pb-32">
+        <div className="min-h-screen bg-dark pb-32">
             {/* Romantic Hero Header */}
-            <div className="bg-mesh-romantic px-8 pt-16 pb-28 rounded-b-[60px] shadow-2xl relative overflow-hidden border-b border-white/5">
+            <div className="bg-mesh-romantic px-8 pt-16 pb-24 rounded-b-[60px] shadow-2xl relative overflow-hidden border-b border-white/5">
                 <div className="absolute top-0 right-0 p-10 opacity-5 animate-heartbeat">
                     <Heart size={200} fill="white" />
                 </div>
@@ -85,12 +85,12 @@ export default function Dashboard() {
             </div>
 
             {/* Content Area */}
-            <div className="px-6 -mt-12 space-y-6 relative z-20">
+            <div className="px-6 -mt-10 space-y-6 relative z-20">
 
                 {/* 1. Main Sync Card - Elevated */}
                 <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    className="premium-card p-8 relative overflow-hidden group"
+                    whileHover={{ scale: 1.01 }}
+                    className="premium-card p-8 relative overflow-hidden group bg-black/40"
                 >
                     <div className="absolute -right-10 -top-10 w-40 h-40 bg-primary/10 rounded-full blur-[40px] mix-blend-screen" />
 
@@ -100,12 +100,12 @@ export default function Dashboard() {
                         </div>
                         <div className="text-right">
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-1">Couples Sync</p>
-                            <h2 className="text-5xl font-black text-white tracking-tighter drop-shadow-[0_0_20px_rgba(255,42,95,0.4)]">98<span className="text-2xl text-white/50">%</span></h2>
+                            <h2 className="text-5xl font-bold text-white tracking-tighter drop-shadow-[0_0_20px_rgba(255,42,95,0.4)]">98<span className="text-2xl text-white/50">%</span></h2>
                         </div>
                     </div>
 
                     <div className="space-y-4 relative z-10">
-                        <div className="h-3 bg-black/40 rounded-full overflow-hidden border border-white/5 shadow-inner">
+                        <div className="h-2.5 bg-black/40 rounded-full overflow-hidden border border-white/5 shadow-inner">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: '98%' }}
@@ -123,7 +123,7 @@ export default function Dashboard() {
 
                     <button
                         onClick={handleSendNudge}
-                        className="w-full mt-8 bg-white/5 border border-white/10 text-white py-5 rounded-[20px] font-black text-[10px] uppercase tracking-[0.3em] shadow-lg hover:bg-white/10 hover:border-white/20 hover:text-primary transition-all relative overflow-hidden group/btn"
+                        className="w-full mt-8 bg-primary/10 border border-primary/20 text-white py-5 rounded-[22px] font-black text-[10px] uppercase tracking-[0.4em] shadow-lg hover:bg-primary/20 hover:border-primary/40 transition-all relative overflow-hidden group/btn"
                     >
                         <span className="relative z-10">Send Heart Pulse</span>
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
@@ -131,10 +131,10 @@ export default function Dashboard() {
                 </motion.div>
 
                 {/* 2. 2x2 Feature Grid */}
-                <div className="grid grid-cols-2 gap-5">
+                <div className="grid grid-cols-2 gap-4">
                     {/* Item 1: Whispers */}
-                    <Link to="/chat" className="premium-card p-6 flex flex-col items-center text-center group border border-white/5">
-                        <div className="w-12 h-12 bg-indigo-500/10 text-indigo-400 rounded-[18px] border border-indigo-500/20 flex items-center justify-center mb-4 transition-transform group-hover:scale-110 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
+                    <Link to="/chat" className="premium-card p-6 flex flex-col items-center text-center group bg-black/20">
+                        <div className="w-12 h-12 bg-indigo-500/10 text-indigo-400 rounded-2xl border border-indigo-500/10 flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
                             <MessageCircle size={22} />
                         </div>
                         <h4 className="font-bold text-white tracking-wide text-sm">Whispers</h4>
@@ -142,21 +142,21 @@ export default function Dashboard() {
                     </Link>
 
                     {/* Item 2: Rituals */}
-                    <Link to="/activities" className="premium-card p-6 flex flex-col items-center text-center group border border-white/5">
-                        <div className="w-12 h-12 bg-amber-500/10 text-amber-400 rounded-[18px] border border-amber-500/20 flex items-center justify-center mb-4 transition-transform group-hover:scale-110 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
+                    <Link to="/activities" className="premium-card p-6 flex flex-col items-center text-center group bg-black/20">
+                        <div className="w-12 h-12 bg-amber-500/10 text-amber-400 rounded-2xl border border-amber-500/10 flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
                             <Sparkles size={22} />
                         </div>
                         <h4 className="font-bold text-white tracking-wide text-sm">Rituals</h4>
                         <p className="text-[9px] uppercase font-black text-white/30 mt-1 tracking-[0.2em]">Play Area</p>
                     </Link>
 
-                    {/* Item 3: Live Distance (Under Whispers) */}
+                    {/* Item 3: Live Distance */}
                     <button
                         onClick={distance ? () => window.open('https://www.google.com/maps/dir/?api=1', '_blank') : fetchLiveLocation}
                         disabled={isLocating}
-                        className="premium-card p-6 flex flex-col items-center text-center group border border-white/5 transition-all active:scale-95"
+                        className="premium-card p-6 flex flex-col items-center text-center group bg-black/20 transition-all active:scale-95"
                     >
-                        <div className={`w-12 h-12 ${distance ? 'bg-primary/20 text-primary' : 'bg-sky-500/10 text-sky-400'} rounded-[18px] border ${distance ? 'border-primary/20' : 'border-sky-500/20'} flex items-center justify-center mb-4 transition-transform group-hover:scale-110 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]`}>
+                        <div className={`w-12 h-12 ${distance ? 'bg-primary/20 text-primary' : 'bg-sky-500/10 text-sky-400'} rounded-2xl border ${distance ? 'border-primary/20' : 'border-sky-500/10'} flex items-center justify-center mb-4 transition-transform group-hover:scale-110`}>
                             {distance ? <Navigation size={22} className="animate-pulse" /> : <MapPin size={22} />}
                         </div>
                         <h4 className="font-bold text-white tracking-wide text-sm">Distance</h4>
@@ -165,9 +165,9 @@ export default function Dashboard() {
                         </p>
                     </button>
 
-                    {/* Item 4: Calendar (Under Rituals) */}
-                    <Link to="/memories" className="premium-card p-6 flex flex-col items-center text-center group border border-white/5">
-                        <div className="w-12 h-12 bg-rose-500/10 text-rose-400 rounded-[18px] border border-rose-500/20 flex items-center justify-center mb-4 transition-transform group-hover:scale-110 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
+                    {/* Item 4: Calendar */}
+                    <Link to="/memories" className="premium-card p-6 flex flex-col items-center text-center group bg-black/20">
+                        <div className="w-12 h-12 bg-rose-500/10 text-rose-400 rounded-2xl border border-rose-500/10 flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
                             <Calendar size={22} />
                         </div>
                         <h4 className="font-bold text-white tracking-wide text-sm">Calendar</h4>
@@ -175,17 +175,17 @@ export default function Dashboard() {
                     </Link>
                 </div>
 
-                {/* 3. Daily Intention Card / Memory Preview - Refined */}
-                <div className="premium-card p-8 bg-gradient-to-br from-[#1E1E24] to-[#121214] border border-white/10 overflow-hidden relative shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
+                {/* 3. Daily Intention Card */}
+                <div className="premium-card p-8 bg-gradient-to-br from-[#1A1A1F] to-[#09090B] border border-white/5 overflow-hidden relative shadow-2xl">
                     <div className="absolute top-0 right-0 p-4 opacity-5">
                         <Calendar size={120} />
                     </div>
                     <div className="relative z-10">
                         <h3 className="text-xl font-serif text-white mb-2 tracking-wide italic">Next Milestone</h3>
                         <p className="text-white/40 text-[13px] font-medium mb-8 leading-relaxed max-w-[260px]">
-                            {partnerName ? `${partnerName}'s Birthday is coming up in 12 days.` : "Capture your first memory together to start the timeline."}
+                            {partnerName ? `${partnerName}'s Birthday is coming up.` : "Capture your first memory together to start the timeline."}
                         </p>
-                        <Link to="/memories" className="flex items-center gap-3 bg-black/40 px-5 py-4 rounded-2xl border border-white/5 hover:border-white/20 transition-colors cursor-pointer group">
+                        <Link to="/memories" className="flex items-center gap-3 bg-white/5 px-5 py-4 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors group">
                             <div className="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center">
                                 <Calendar size={14} />
                             </div>
@@ -200,14 +200,14 @@ export default function Dashboard() {
                     <h2 className="font-serif italic text-2xl text-white mb-2">Deep Hearts.</h2>
                     <p className="text-white/40 text-xs font-medium mb-8 max-w-[280px]">Everything you need to nurture a conscious and lasting bond.</p>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         {[
-                            { icon: Activity, title: "Bio-Sync", desc: "Shared wellness frequency", col: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
-                            { icon: Flame, title: "Intensity", desc: "Passionate rituals", col: "bg-rose-500/10 text-rose-400 border-rose-500/20" },
-                            { icon: HeartHandshake, title: "Support", desc: "Emotional intelligence", col: "bg-blue-500/10 text-blue-400 border-blue-500/20" }
+                            { icon: Activity, title: "Bio-Sync", desc: "Shared wellness frequency", col: "bg-emerald-500/10 text-emerald-400 border-emerald-500/10" },
+                            { icon: Flame, title: "Intensity", desc: "Passionate rituals", col: "bg-rose-500/10 text-rose-400 border-rose-500/10" },
+                            { icon: HeartHandshake, title: "Support", desc: "Emotional intelligence", col: "bg-blue-500/10 text-blue-400 border-blue-500/10" }
                         ].map((item, i) => (
-                            <div key={i} className="flex items-center gap-5 text-left bg-white/5 border border-white/5 rounded-3xl p-4 hover:bg-white/10 transition-colors cursor-pointer">
-                                <div className={`w-12 h-12 rounded-[18px] ${item.col} border flex items-center justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]`}>
+                            <div key={i} className="flex items-center gap-5 text-left bg-black/20 border border-white/5 rounded-3xl p-4 hover:bg-black/30 transition-colors">
+                                <div className={`w-12 h-12 rounded-2xl ${item.col} border flex items-center justify-center`}>
                                     <item.icon size={20} />
                                 </div>
                                 <div>
