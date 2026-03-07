@@ -38,13 +38,13 @@ const TopNav = () => {
   const customAvatar = useSyncStore(s => s.customAvatar);
 
   return (
-    <div className="sticky top-0 z-[100] px-6 py-5 flex items-center justify-between bg-black/40 backdrop-blur-2xl border-b border-white/5">
+    <div className="sticky top-0 z-[100] px-6 py-5 flex items-center justify-between bg-[#09090B]/80 backdrop-blur-2xl border-b border-white/5">
       <Link to="/" className="flex items-center gap-3 hover:scale-105 transition-transform active:scale-95 group">
         <AppLogo />
         <span className="font-serif italic text-white tracking-widest text-xl group-hover:text-primary transition-colors uppercase">Synch</span>
       </Link>
       <Link to="/profile">
-        <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden shadow-2xl transition-all hover:scale-110 active:scale-95 hover:border-primary/50 hover:shadow-primary/20">
+        <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden shadow-2xl transition-all hover:scale-110 active:scale-95 hover:border-primary/50 hover:shadow-primary/20 bg-white/5">
           <img
             src={customAvatar || getAvatarUrl(user?.id)}
             alt="Profile"
@@ -88,7 +88,7 @@ const BottomNav = () => {
 
 const Layout = () => {
   return (
-    <div className="min-h-[100dvh] bg-cream w-full max-w-md mx-auto relative shadow-[0_0_100px_rgba(0,0,0,0.8)] flex flex-col border-x border-white/5 overflow-hidden">
+    <div className="min-h-[100dvh] bg-[#09090B] w-full max-w-md mx-auto relative shadow-[0_0_100px_rgba(0,0,0,1)] flex flex-col border-x border-white/5 overflow-hidden">
       <TopNav />
       <div className="flex-1 pb-28 relative overflow-y-auto">
         <Outlet />
