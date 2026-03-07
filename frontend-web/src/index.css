@@ -46,6 +46,13 @@ body {
   transform: translateY(-2px);
 }
 
+.glass {
+  background: rgba(20, 20, 20, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .bg-mesh-romantic {
   background-color: #09090B !important;
   background-image:
