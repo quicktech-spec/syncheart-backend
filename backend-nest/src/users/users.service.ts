@@ -128,15 +128,23 @@ export class UsersService {
         });
         if (!rel) throw new NotFoundException('No active relationship found');
 
-        // Hard delete all relationship data (messages, insights, checkins)
-        await this.messagesRepo.delete({ relationship_id: rel.id });
-        await this.checkinsRepo.delete({ relationship: { id: rel.id } });
-        await this.programProgressRepo.delete({ relationship_id: rel.id });
-        await this.conflictsRepo.delete({ relationship: { id: rel.id } });
-        await this.aiInsightsRepo.delete({ relationship: { id: rel.id } });
-        await this.relationshipsRepo.delete(rel.id);
+        const relId = rel.id;
 
-        return { message: 'Sync connection severed successfully' };
+        // Safe cascade deletes - each wrapped to prevent missing table crashing the flow
+        try { await this.messagesRepo.delete({ relationship_id: relId }); } catch (_e) { /* table may not exist */ }
+        try { await this.checkinsRepo.delete({ relationship: { id: relId } }); } catch (_e) { /* ignore */ }
+        try { await this.programProgressRepo.delete({ relationship_id: relId }); } catch (_e) { /* ignore */ }
+        try { await this.conflictsRepo.delete({ relationship: { id: relId } }); } catch (_e) { /* ignore */ }
+        try { await this.aiInsightsRepo.delete({ relationship: { id: relId } }); } catch (_e) { /* ignore */ }
+
+        // The critical delete - must succeed
+        await this.relationshipsRepo.delete(relId);
+
+        return {
+            message: 'Sync connection severed successfully',
+            partner_id: rel.partner_1.id === userId ? rel.partner_2.id : rel.partner_1.id,
+            partner_name: rel.partner_1.id === userId ? rel.partner_2.display_name : rel.partner_1.display_name,
+        };
     }
 
     /** Send E2E encrypted message — server stores ciphertext only */

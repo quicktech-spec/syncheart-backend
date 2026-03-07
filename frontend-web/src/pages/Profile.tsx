@@ -14,8 +14,10 @@ export default function Profile() {
     const partner = useSyncStore(s => s.partner);
     const profile = useSyncStore(s => s.profile);
     const profilePic = useSyncStore(s => s.customAvatar);
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(window.location.search.includes('edit=true'));
     const [editForm, setEditForm] = useState(profile || {});
+
+    const DEFAULT_AVATAR = "https://api.dicebear.com/7.x/avataaars/svg?seed=heart&backgroundColor=ff2a5f";
 
     const handleImageUpload = async (e: any) => {
         const file = e.target.files[0];
@@ -66,20 +68,25 @@ export default function Profile() {
     const handleBreakSync = async () => {
         if (!confirm("Are you sure you want to disconnect your heart frequency from your partner? This is permanent.")) return;
         try {
-            await axios.post(`${BASE_URL}/api/v1/users/break-sync`, {}, {
+            const res = await axios.delete(`${BASE_URL}/api/v1/users/me/relationship`, {
                 headers: { Authorization: `Bearer ${user?.id}` }
             });
 
-            sendWS({
-                type: 'break_sync',
-                partnerId: partner?.id,
-                fromName: profile?.display_name || 'Your partner'
-            });
+            // Notify partner via WS (best-effort)
+            try {
+                sendWS({
+                    type: 'break_sync',
+                    partnerId: res.data?.partner_id || partner?.id,
+                    fromName: profile?.display_name || 'Your partner'
+                });
+            } catch (_e) { /* WS is optional */ }
 
             useSyncStore.getState().setPartner(null);
-            alert("Frequency disconnected.");
-        } catch (e) {
-            alert("Failed to disconnect. Try again.");
+            alert("Frequency disconnected. 💔");
+        } catch (e: any) {
+            const msg = e?.response?.data?.message || e?.message || 'Unknown error';
+            alert(`Failed to disconnect: ${msg}`);
+            console.error('Break sync error:', e?.response?.data || e);
         }
     };
 
@@ -107,10 +114,10 @@ export default function Profile() {
                         <div className="w-32 h-32 rounded-[40px] p-1.5 bg-white/10 backdrop-blur-xl shadow-2xl relative border border-white/20 rotate-3 transition-transform group-hover:rotate-0">
                             <div className="w-full h-full rounded-[34px] overflow-hidden">
                                 <img
-                                    src={profilePic || getAvatarUrl(user?.id)}
+                                    src={profilePic || (profile?.email ? getAvatarUrl(profile.email) : DEFAULT_AVATAR)}
                                     alt="Profile"
                                     className="w-full h-full object-cover"
-                                    onError={(e) => { (e.target as HTMLImageElement).src = getAvatarUrl(user?.id); }}
+                                    onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_AVATAR; }}
                                 />
                             </div>
                             <label className="absolute -bottom-2 -right-2 w-10 h-10 bg-primary text-white rounded-[14px] flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all outline outline-4 outline-[#09090B]">
@@ -200,6 +207,11 @@ export default function Profile() {
                                     try {
                                         const res = await axios.post(`${BASE_URL}/api/v1/users/sync-couple`, { invite_code: code }, { headers: { Authorization: `Bearer ${user?.id}` } });
                                         if (res.data?.partner) {
+                                            sendWS({
+                                                type: 'sync_complete',
+                                                partnerId: res.data.partner.id,
+                                                fromName: profile?.display_name || 'Your partner'
+                                            });
                                             useSyncStore.getState().setPartner(res.data.partner);
                                             alert(" Hearts Synced! ✨");
                                             window.location.reload();
@@ -264,6 +276,23 @@ export default function Profile() {
                                 <button onClick={() => setIsEditing(false)} className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-all"><X size={18} /></button>
                             </div>
 
+                            <div className="flex flex-col items-center mb-8">
+                                <div className="relative group">
+                                    <div className="w-24 h-24 rounded-[30px] p-1 bg-white/10 backdrop-blur-xl relative border border-white/20">
+                                        <img
+                                            src={profilePic || DEFAULT_AVATAR}
+                                            alt="Preview"
+                                            className="w-full h-full object-cover rounded-[26px]"
+                                        />
+                                        <label className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary text-white rounded-[10px] flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-all border border-[#121214]">
+                                            <Camera size={14} />
+                                            <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                                        </label>
+                                    </div>
+                                </div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mt-3">Upload Profile Aura</p>
+                            </div>
+
                             <div className="space-y-5 mb-8">
                                 <div>
                                     <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 ml-4 mb-2 block">Display Name</label>
@@ -275,23 +304,23 @@ export default function Profile() {
                                 </div>
                                 <div>
                                     <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 ml-4 mb-2 block">Love Language</label>
-                                    <select value={editForm.love_language || ''} onChange={e => setEditForm({ ...editForm, love_language: e.target.value })} className="w-full bg-black/50 rounded-[20px] py-4 px-6 font-bold text-white outline-none border border-white/5 focus:border-primary/50 focus:bg-white/5 transition-all shadow-inner [color-scheme:dark]">
-                                        <option value="">Select...</option>
-                                        <option value="Words of Affirmation">Words of Affirmation</option>
-                                        <option value="Acts of Service">Acts of Service</option>
-                                        <option value="Receiving Gifts">Receiving Gifts</option>
-                                        <option value="Quality Time">Quality Time</option>
-                                        <option value="Physical Touch">Physical Touch</option>
+                                    <select value={editForm.love_language || ''} onChange={e => setEditForm({ ...editForm, love_language: e.target.value })} className="w-full bg-black/60 rounded-[20px] py-4 px-6 font-bold text-white outline-none border border-white/10 focus:border-primary focus:bg-white/5 transition-all shadow-inner appearance-none">
+                                        <option value="" className="bg-[#121214]">Select...</option>
+                                        <option value="Words of Affirmation" className="bg-[#121214]">Words of Affirmation</option>
+                                        <option value="Acts of Service" className="bg-[#121214]">Acts of Service</option>
+                                        <option value="Receiving Gifts" className="bg-[#121214]">Receiving Gifts</option>
+                                        <option value="Quality Time" className="bg-[#121214]">Quality Time</option>
+                                        <option value="Physical Touch" className="bg-[#121214]">Physical Touch</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 ml-4 mb-2 block">Attachment Style</label>
-                                    <select value={editForm.attachment_style || ''} onChange={e => setEditForm({ ...editForm, attachment_style: e.target.value })} className="w-full bg-black/50 rounded-[20px) py-4 px-6 font-bold text-white outline-none border border-white/5 focus:border-primary/50 focus:bg-white/5 transition-all shadow-inner [color-scheme:dark]">
-                                        <option value="">Select...</option>
-                                        <option value="Secure">Secure</option>
-                                        <option value="Anxious">Anxious</option>
-                                        <option value="Avoidant">Avoidant</option>
-                                        <option value="Disorganized">Disorganized</option>
+                                    <select value={editForm.attachment_style || ''} onChange={e => setEditForm({ ...editForm, attachment_style: e.target.value })} className="w-full bg-black/60 rounded-[20px] py-4 px-6 font-bold text-white outline-none border border-white/10 focus:border-primary focus:bg-white/5 transition-all shadow-inner appearance-none">
+                                        <option value="" className="bg-[#121214]">Select...</option>
+                                        <option value="Secure" className="bg-[#121214]">Secure</option>
+                                        <option value="Anxious" className="bg-[#121214]">Anxious</option>
+                                        <option value="Avoidant" className="bg-[#121214]">Avoidant</option>
+                                        <option value="Disorganized" className="bg-[#121214]">Disorganized</option>
                                     </select>
                                 </div>
                             </div>

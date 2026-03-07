@@ -104,6 +104,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'https://syncheart-backend-prod
 
 function App() {
   const user = useSyncStore(s => s.user);
+  const profile = useSyncStore(s => s.profile);
   const setProfile = useSyncStore(s => s.setProfile);
   const setPartner = useSyncStore(s => s.setPartner);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -133,9 +134,19 @@ function App() {
         .catch(() => { setPartner(null); });
 
       const unsubscribe = subscribeToWS((data) => {
-        if (data.type === 'break_sync' && data.partnerId === user.id) {
+        if (data.type === 'break_sync' && data.partnerId === profile?.id) {
           setPartner(null);
           alert(`💔 ${data.fromName || 'Your partner'} has disconnected the sync frequency.`);
+        }
+        if (data.type === 'sync_complete' && data.partnerId === profile?.id) {
+          // Partner has synced with us, re-fetch relationship
+          axios.get(`${BASE_URL}/api/v1/users/me/relationship`, { headers })
+            .then(res => {
+              if (res.data?.data?.partner) {
+                setPartner(res.data.data.partner);
+                alert(`✨ ${data.fromName || 'Your partner'} has synchronized their heart with yours!`);
+              }
+            });
         }
       });
       return () => unsubscribe();

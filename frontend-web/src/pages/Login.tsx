@@ -22,6 +22,14 @@ export default function Login() {
             const endpoint = isLogin ? '/api/v1/auth/login' : '/api/v1/auth/register';
             const res = await axios.post(`${BASE_URL}${endpoint}`, { email, password });
             setUser({ id: res.data.access_token, email });
+            // Use small timeout to ensure state update propagates before navigation
+            setTimeout(() => {
+                if (!isLogin) {
+                    window.location.href = '/profile?edit=true';
+                } else {
+                    window.location.href = '/';
+                }
+            }, 100);
         } catch (err: any) {
             setError(err.response?.data?.message || 'Authentication failed. Please verify your frequency.');
         } finally {

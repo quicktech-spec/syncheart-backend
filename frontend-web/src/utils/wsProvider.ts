@@ -3,10 +3,16 @@ const listeners: Listener[] = [];
 let ws: WebSocket | null = null;
 let reconnectTimer: any = null;
 
+const getWSUrl = () => {
+    const apiBase = import.meta.env.VITE_API_URL || 'syncheart-backend-production.up.railway.app';
+    const cleanUrl = apiBase.replace('https://', '').replace('http://', '');
+    return (apiBase.includes('localhost') ? 'ws://' : 'wss://') + cleanUrl;
+};
+
 const connectWS = () => {
     if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
 
-    ws = new WebSocket('ws://localhost:8080');
+    ws = new WebSocket(getWSUrl());
 
     ws.onmessage = (e) => {
         try {
