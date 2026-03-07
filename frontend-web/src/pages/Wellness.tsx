@@ -1,9 +1,7 @@
 import { motion } from 'framer-motion';
 import {
-    Flower2,
     Wind,
     Moon,
-    Heart,
     ChevronLeft,
     Play,
     Zap,

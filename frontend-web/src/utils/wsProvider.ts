@@ -1,16 +1,32 @@
-export const ws = new WebSocket('ws://localhost:8080');
-
 type Listener = (data: any) => void;
 const listeners: Listener[] = [];
+let ws: WebSocket | null = null;
+let reconnectTimer: any = null;
 
-ws.onmessage = (e) => {
-    try {
-        const data = JSON.parse(e.data);
-        listeners.forEach(l => l(data));
-    } catch (err) {
-        console.error(err);
-    }
+const connectWS = () => {
+    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+
+    ws = new WebSocket('ws://localhost:8080');
+
+    ws.onmessage = (e) => {
+        try {
+            const data = JSON.parse(e.data);
+            listeners.forEach(l => l(data));
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    ws.onclose = () => {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = setTimeout(connectWS, 2000);
+    };
+
+    ws.onerror = () => ws?.close();
 };
+
+// Initialize connection
+connectWS();
 
 export const subscribeToWS = (callback: Listener) => {
     listeners.push(callback);
@@ -21,11 +37,18 @@ export const subscribeToWS = (callback: Listener) => {
 };
 
 export const sendWS = (data: any) => {
-    if (ws.readyState === WebSocket.OPEN) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify(data));
     } else {
-        ws.addEventListener('open', () => {
-            ws.send(JSON.stringify(data));
-        }, { once: true });
+        // Queue the message or try reconnecting
+        connectWS();
+        const checkReady = setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify(data));
+                clearInterval(checkReady);
+            }
+        }, 100);
+        // Timeout queue
+        setTimeout(() => clearInterval(checkReady), 5000);
     }
 };

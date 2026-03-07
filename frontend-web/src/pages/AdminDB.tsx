@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Database, Search, ArrowLeft, Heart, HeartOff, User, Edit2, ShieldAlert, Sparkles, AlertTriangle } from 'lucide-react';
+import { Database, Search, ArrowLeft, HeartOff, User, Edit2, ShieldAlert, AlertTriangle } from 'lucide-react';
 import { useSyncStore } from '../store';
 import { Link } from 'react-router-dom';
 
@@ -61,36 +61,36 @@ export default function AdminDB() {
     const filteredUsers = users.filter(u => `${u.display_name} ${u.email}`.toLowerCase().includes(search.toLowerCase()));
 
     return (
-        <div className="min-h-screen bg-black text-rose-50 pb-32">
+        <div className="min-h-screen bg-[#09090B] text-white pb-32">
             {/* Header */}
-            <div className="bg-gradient-to-b from-rose-900 to-black px-6 pt-16 pb-12 shadow-2xl relative border-b border-rose-900/50">
+            <div className="bg-gradient-to-b from-[#1E1E24] to-[#09090B] px-6 pt-16 pb-12 shadow-2xl relative border-b border-white/5">
                 <div className="flex items-center justify-between mb-8">
-                    <Link to="/profile" className="w-12 h-12 bg-black/40 backdrop-blur-md rounded-2xl flex items-center justify-center text-rose-200 border border-rose-500/20 hover:bg-rose-900/50 transition-all">
+                    <Link to="/profile" className="w-12 h-12 bg-white/5 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/10 hover:bg-white/10 transition-all">
                         <ArrowLeft size={24} />
                     </Link>
                     <div className="flex items-center gap-3 bg-red-500/10 px-4 py-2 rounded-full border border-red-500/20">
                         <ShieldAlert size={16} className="text-red-400" />
-                        <span className="text-xs font-black uppercase text-red-400 tracking-widest">Admin Access</span>
+                        <span className="text-[10px] font-black uppercase text-red-400 tracking-widest">Admin Access</span>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-4 mb-4">
-                    <Database size={40} className="text-rose-400 drop-shadow-[0_0_15px_rgba(255,51,102,0.5)]" />
+                    <Database size={40} className="text-primary drop-shadow-[0_0_15px_rgba(255,42,95,0.5)]" />
                     <div>
-                        <h1 className="text-4xl font-black tracking-tighter text-white">System DB</h1>
-                        <p className="text-rose-400/60 font-black uppercase tracking-[0.3em] text-[10px] mt-1">Global Relationship Engine</p>
+                        <h1 className="text-4xl font-serif text-white italic">Heart Registry</h1>
+                        <p className="text-white/40 font-black uppercase tracking-[0.3em] text-[10px] mt-1">Global Connection Engine</p>
                     </div>
                 </div>
             </div>
 
             <div className="px-6 -mt-6">
                 <div className="relative mb-8">
-                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-rose-500/50" size={20} />
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20" size={20} />
                     <input
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder="Search users..."
-                        className="w-full bg-[#1A1A24] border-2 border-rose-900/30 rounded-full py-5 px-16 text-sm font-bold text-white outline-none focus:border-rose-500/50 transition-all placeholder:text-rose-500/30 shadow-2xl"
+                        className="w-full bg-black/40 border-2 border-white/5 rounded-full py-5 px-16 text-sm font-bold text-white outline-none focus:border-primary/50 transition-all placeholder:text-white/20 shadow-2xl"
                     />
                 </div>
 
@@ -102,30 +102,28 @@ export default function AdminDB() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.05 }}
-                                className="bg-[#12121A] border-2 border-rose-900/20 p-6 rounded-[30px] shadow-xl relative overflow-hidden group"
+                                className="premium-card p-6 flex flex-col border border-white/5 group"
                             >
-                                {u.isCurrentUser && <div className="absolute top-0 right-0 bg-rose-500 text-white text-[8px] font-black uppercase tracking-widest px-4 py-1 rounded-bl-xl shadow-lg">You</div>}
-
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-rose-900/30 rounded-2xl flex items-center justify-center text-rose-400 border border-rose-500/20">
+                                        <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-white border border-white/10">
                                             <User size={20} />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-black text-white">{u.display_name}</h3>
-                                            <p className="text-xs text-rose-400/50 font-medium tracking-wide">{u.email}</p>
+                                            <h3 className="text-lg font-bold text-white">{u.display_name}</h3>
+                                            <p className="text-xs text-white/40 font-medium tracking-wide">{u.email}</p>
                                         </div>
                                     </div>
-                                    <button onClick={() => handleUpdateName(u.id)} className="w-10 h-10 bg-[#1A1A24] rounded-xl flex items-center justify-center text-rose-400 hover:text-white transition-all">
+                                    <button onClick={() => handleUpdateName(u.id)} className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-all">
                                         <Edit2 size={16} />
                                     </button>
                                 </div>
 
-                                <div className="flex items-center justify-between mt-6 bg-black/40 p-4 rounded-2xl border border-rose-900/20">
+                                <div className="flex items-center justify-between mt-6 bg-black/40 p-4 rounded-2xl border border-white/5">
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-2 h-2 rounded-full ${u.status === 'paired' ? 'bg-rose-500 animate-pulse shadow-[0_0_10px_#f43f5e]' : 'bg-gray-600'}`}></div>
-                                        <span className="text-[10px] uppercase font-black tracking-widest text-rose-200">
-                                            {u.status === 'paired' ? 'Connected' : 'Single'}
+                                        <div className={`w-2 h-2 rounded-full ${u.status === 'paired' ? 'bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]' : 'bg-white/20'}`}></div>
+                                        <span className="text-[10px] uppercase font-black tracking-widest text-white/40">
+                                            {u.status === 'paired' ? 'Paired' : 'Single'}
                                         </span>
                                     </div>
 
@@ -137,8 +135,8 @@ export default function AdminDB() {
                                             <HeartOff size={14} /> Sever Link
                                         </button>
                                     ) : (
-                                        <div className="flex items-center gap-2 text-rose-500/40 font-black text-[10px] uppercase tracking-widest">
-                                            <AlertTriangle size={14} /> Unpaired
+                                        <div className="flex items-center gap-2 text-white/20 font-black text-[10px] uppercase tracking-widest">
+                                            <AlertTriangle size={14} /> Unlinked
                                         </div>
                                     )}
                                 </div>

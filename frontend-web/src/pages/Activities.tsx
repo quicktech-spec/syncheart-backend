@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Gamepad2, Music, Tv, Activity, ChevronRight, ChevronLeft, Search, Play, Dumbbell, Flower2, HeartPulse, Sparkles, BrainCircuit, Heart, Mic, Phone, X, Video } from 'lucide-react';
+import { Gamepad2, Music, Tv, Activity, ChevronRight, ChevronLeft, Search, Play, Dumbbell, Flower2, HeartPulse, Sparkles, BrainCircuit, Heart, Mic, Phone } from 'lucide-react';
 import { useSyncStore } from '../store';
 import { useRef } from 'react';
 import { subscribeToWS, sendWS } from '../utils/wsProvider';
@@ -8,7 +8,7 @@ import { subscribeToWS, sendWS } from '../utils/wsProvider';
 type ActivitySpace = 'home' | 'music' | 'movies' | 'fitness' | 'games';
 
 export default function Activities() {
-    const profile = useSyncStore(s => s.profile); // added profile
+    const profile = useSyncStore(s => s.profile);
     const partner = useSyncStore(s => s.partner);
     const partnerName = partner ? (partner as any).display_name || partner.email.split('@')[0] : 'your partner';
     const [activeSpace, setActiveSpace] = useState<ActivitySpace>('home');
@@ -16,14 +16,12 @@ export default function Activities() {
     // --- Media Sync & WebRTC State ---
     const [inviteState, setInviteState] = useState<'idle' | 'sending' | 'waiting_response' | 'declined' | 'watching_together'>('idle');
     const [incomingInvite, setIncomingInvite] = useState<any>(null);
-    const [activeMedia, setActiveMedia] = useState<any>(null);
     const [showVideoCall, setShowVideoCall] = useState(false);
     const localVideoRef = useRef<HTMLVideoElement>(null);
     const inviteTimeoutRef = useRef<any>(null);
 
     const tabIdRef = useRef(Math.random().toString(36).substring(2, 9));
     const tabId = tabIdRef.current;
-    const wsRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
         const unsubscribe = subscribeToWS((data) => {
@@ -53,7 +51,6 @@ export default function Activities() {
     };
 
     const sendInvite = (media: any, activityType: string) => {
-        setActiveMedia(media);
         setInviteState('waiting_response');
 
         sendWS({
@@ -82,7 +79,6 @@ export default function Activities() {
             timestamp: Date.now()
         });
 
-        setActiveMedia(incomingInvite.media);
         setActiveSpace(incomingInvite.activityType);
         setInviteState('watching_together');
         setShowVideoCall(true);
@@ -112,7 +108,6 @@ export default function Activities() {
 
     // --- Music State ---
     const [searchQuery, setSearchQuery] = useState("");
-    const [musicHistory, setMusicHistory] = useState<string[]>(['Lover Taylor Swift', 'Perfect Ed Sheeran']);
     const [isSearching, setIsSearching] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [dropdownResults, setDropdownResults] = useState<any[]>([]);
@@ -150,8 +145,6 @@ export default function Activities() {
     }, [searchQuery]);
 
     const handleSelectSong = (song: any) => {
-        const q = `${song.trackName} ${song.artistName}`;
-        setMusicHistory(prev => [q, ...prev.filter(h => h !== q)].slice(0, 2));
         setActiveQueue(prev => [song, ...prev.filter(s => s.id !== song.id)]);
         setShowDropdown(false);
         setSearchQuery("");
@@ -160,17 +153,17 @@ export default function Activities() {
 
     const renderMusicView = () => (
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="h-full flex flex-col">
-            <h2 className="section-header text-romantic mb-8">Listen Together.</h2>
+            <h2 className="section-header text-romantic mb-8 text-white">Listen Together.</h2>
 
             <div className="premium-card p-6 mb-8 relative z-50">
                 <div className="relative">
-                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-romantic/20" size={20} />
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20" size={20} />
                     <input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onFocus={() => searchQuery.trim() && setShowDropdown(true)}
                         placeholder="Search for a frequency..."
-                        className="w-full bg-cream border-2 border-transparent focus:border-primary/10 rounded-full py-5 px-16 text-sm font-black text-romantic outline-none transition-all placeholder:text-romantic/20"
+                        className="w-full bg-black/40 border-2 border-transparent focus:border-primary/10 rounded-full py-5 px-16 text-sm font-black text-white outline-none transition-all placeholder:text-white/20"
                     />
 
                     <AnimatePresence>
@@ -179,27 +172,27 @@ export default function Activities() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                className="absolute top-[80px] left-0 right-0 bg-white border-2 border-rose-50 rounded-[35px] shadow-2xl overflow-hidden z-[100]"
+                                className="absolute top-[80px] left-0 right-0 bg-[#121214] border-2 border-white/5 rounded-[35px] shadow-2xl overflow-hidden z-[100]"
                             >
                                 {isSearching ? (
-                                    <div className="p-10 text-center text-romantic/20 text-[10px] font-black uppercase tracking-[0.2em] italic">Scanning Waves...</div>
+                                    <div className="p-10 text-center text-white/20 text-[10px] font-black uppercase tracking-[0.2em] italic">Scanning Waves...</div>
                                 ) : dropdownResults.length > 0 ? (
                                     dropdownResults.map((t, i) => (
                                         <div
                                             key={i}
                                             onClick={() => handleSelectSong(t)}
-                                            className="flex items-center gap-5 p-5 hover:bg-rose-50 cursor-pointer border-b border-rose-50 last:border-0 transition-all"
+                                            className="flex items-center gap-5 p-5 hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-0 transition-all"
                                         >
                                             <img src={t.artworkUrl100} className="w-14 h-14 rounded-2xl object-cover shadow-sm" alt="Art" />
                                             <div className="flex-1 overflow-hidden">
-                                                <p className="font-black text-romantic text-md truncate">{t.trackName}</p>
-                                                <p className="text-romantic/30 text-[10px] font-bold uppercase tracking-widest truncate">{t.artistName}</p>
+                                                <p className="font-black text-white text-md truncate">{t.trackName}</p>
+                                                <p className="text-white/30 text-[10px] font-bold uppercase tracking-widest truncate">{t.artistName}</p>
                                             </div>
-                                            <ChevronRight size={18} className="text-romantic/20" />
+                                            <ChevronRight size={18} className="text-white/20" />
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="p-10 text-center text-romantic/20 text-[10px] font-black uppercase tracking-[0.2em] italic">No Signal Found</div>
+                                    <div className="p-10 text-center text-white/20 text-[10px] font-black uppercase tracking-[0.2em] italic">No Signal Found</div>
                                 )}
                             </motion.div>
                         )}
@@ -208,7 +201,7 @@ export default function Activities() {
             </div>
 
             <div className="flex-1 space-y-4 overflow-y-auto pb-32">
-                <p className="text-romantic/30 font-black text-[10px] uppercase tracking-[0.3em] px-4 mb-4">Frequency History</p>
+                <p className="text-white/30 font-black text-[10px] uppercase tracking-[0.3em] px-4 mb-4">Frequency History</p>
                 {activeQueue.map((t, i) => (
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
@@ -220,16 +213,16 @@ export default function Activities() {
                     >
                         <div className="relative">
                             <img src={t.artworkUrl100} className="w-20 h-20 rounded-2xl shadow-md object-cover" alt="Art" />
-                            <div className="absolute inset-0 bg-romantic/40 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity flex flex-col gap-1">
+                            <div className="absolute inset-0 bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity flex-col gap-1">
                                 <Play fill="white" size={24} className="text-white" />
                                 <span className="text-[8px] text-white font-black uppercase tracking-widest">Live Sync</span>
                             </div>
                         </div>
                         <div className="flex-1 truncate">
-                            <p className="font-black text-romantic text-lg truncate">{t.trackName}</p>
-                            <p className="text-romantic/30 text-[10px] uppercase font-black tracking-widest truncate mt-0.5">{t.artistName}</p>
+                            <p className="font-black text-white text-lg truncate">{t.trackName}</p>
+                            <p className="text-white/30 text-[10px] uppercase font-black tracking-widest truncate mt-0.5">{t.artistName}</p>
                         </div>
-                        <div className="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center text-primary shadow-inner">
+                        <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-primary shadow-inner">
                             <Music size={20} />
                         </div>
                     </motion.div>
@@ -244,11 +237,11 @@ export default function Activities() {
 
     const renderMoviesView = () => (
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="h-full flex flex-col">
-            <h2 className="section-header text-romantic mb-8">Cinema Sync.</h2>
-            <div className="w-full bg-romantic rounded-[50px] overflow-hidden shadow-2xl border-4 border-white aspect-video mb-10 relative">
+            <h2 className="section-header text-white mb-8">Cinema Sync.</h2>
+            <div className="w-full bg-black rounded-[50px] overflow-hidden shadow-2xl border-4 border-white/5 aspect-video mb-10 relative">
                 <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&controls=0&modestbranding=1`} title="YouTube" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" className="absolute top-0 left-0 w-full h-full opacity-90"></iframe>
-                <div className="absolute inset-0 bg-romantic/10 pointer-events-none"></div>
-                <div className="absolute bottom-6 left-8 flex items-center gap-3 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
+                <div className="absolute inset-0 bg-black/10 pointer-events-none"></div>
+                <div className="absolute bottom-6 left-8 flex items-center gap-3 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
                     <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-glow"></div>
                     <p className="text-[10px] font-black uppercase text-white tracking-[0.2em]">{inviteState === 'watching_together' ? 'Partner Synced' : 'Ready to Sync'}</p>
                 </div>
@@ -261,11 +254,11 @@ export default function Activities() {
                 </div>
             ) : (
                 <div className="premium-card p-10">
-                    <h3 className="text-2xl font-black mb-3 tracking-tight text-romantic">Virtual Theater</h3>
-                    <p className="text-romantic/40 text-sm font-medium leading-relaxed mb-8 italic">Experience the magic of shared viewing. Your frequencies are perfectly calibrated.</p>
+                    <h3 className="text-2xl font-black mb-3 tracking-tight text-white">Virtual Theater</h3>
+                    <p className="text-white/40 text-sm font-medium leading-relaxed mb-8 italic">Experience the magic of shared viewing. Your frequencies are perfectly calibrated.</p>
                     <div className="flex gap-4">
-                        <input placeholder="Search Cinema..." className="flex-1 bg-cream border-2 border-transparent focus:border-primary/10 rounded-full py-5 px-8 text-sm font-black text-romantic outline-none transition-all placeholder:text-romantic/20" />
-                        <button onClick={handleWatchMovie} className="bg-romantic text-white px-8 rounded-full font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all">Invite</button>
+                        <input placeholder="Search Cinema..." className="flex-1 bg-black/40 border-2 border-transparent focus:border-primary/10 rounded-full py-5 px-8 text-sm font-black text-white outline-none transition-all placeholder:text-white/20" />
+                        <button onClick={handleWatchMovie} className="bg-primary text-white px-8 rounded-full font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all">Invite</button>
                     </div>
                 </div>
             )}
@@ -274,41 +267,41 @@ export default function Activities() {
 
     const renderFitnessView = () => (
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="h-full flex flex-col">
-            <h2 className="section-header text-romantic mb-8">Bio Rhythm.</h2>
+            <h2 className="section-header text-white mb-8">Bio Rhythm.</h2>
 
             <div className="grid grid-cols-2 gap-6 mb-12">
                 <div className="premium-card p-8 flex flex-col items-center text-center group">
-                    <div className="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-3xl flex items-center justify-center mb-6 shadow-inner group-hover:rotate-12 transition-transform">
+                    <div className="w-16 h-16 bg-emerald-500/10 text-emerald-500 rounded-3xl flex items-center justify-center mb-6 shadow-inner group-hover:rotate-12 transition-transform">
                         <HeartPulse size={32} />
                     </div>
-                    <p className="text-5xl font-black tracking-tighter text-romantic mb-1 leading-none">0</p>
-                    <p className="text-[10px] text-romantic/30 font-black uppercase tracking-[0.2em]">Sync Steps</p>
+                    <p className="text-5xl font-black tracking-tighter text-white mb-1 leading-none">0</p>
+                    <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.2em]">Sync Steps</p>
                 </div>
                 <div className="premium-card p-8 flex flex-col items-center text-center group">
-                    <div className="w-16 h-16 bg-purple-50 text-purple-600 rounded-3xl flex items-center justify-center mb-6 shadow-inner group-hover:rotate-12 transition-transform">
+                    <div className="w-16 h-16 bg-purple-500/10 text-purple-600 rounded-3xl flex items-center justify-center mb-6 shadow-inner group-hover:rotate-12 transition-transform">
                         <Flower2 size={32} />
                     </div>
-                    <p className="text-5xl font-black tracking-tighter text-romantic mb-1 leading-none">0<span className="text-sm font-black">m</span></p>
-                    <p className="text-[10px] text-romantic/30 font-black uppercase tracking-[0.2em]">Flow Time</p>
+                    <p className="text-5xl font-black tracking-tighter text-white mb-1 leading-none">0<span className="text-sm font-black">m</span></p>
+                    <p className="text-[10px] text-white/30 font-black uppercase tracking-[0.2em]">Flow Time</p>
                 </div>
             </div>
 
-            <p className="text-romantic/30 font-black text-[10px] uppercase tracking-[0.3em] px-4 mb-6 italic text-center">Synchronized Rituals</p>
+            <p className="text-white/30 font-black text-[10px] uppercase tracking-[0.3em] px-4 mb-6 italic text-center">Synchronized Rituals</p>
             <div className="space-y-6 mb-32 px-2">
                 {[
-                    { title: "Morning Flow", inst: "Adriene", id: "VaoV1PrYft4", icon: Flower2, col: "bg-purple-50 text-purple-600" },
-                    { title: "Couples HIIT", inst: "MadFit", id: "M0uO8X3_tEA", icon: Dumbbell, col: "bg-emerald-50 text-emerald-600" }
+                    { title: "Morning Flow", inst: "Adriene", id: "VaoV1PrYft4", icon: Flower2, col: "bg-purple-500/10 text-purple-400" },
+                    { title: "Couples HIIT", inst: "MadFit", id: "M0uO8X3_tEA", icon: Dumbbell, col: "bg-emerald-500/10 text-emerald-400" }
                 ].map((vid, i) => (
                     <div key={i} className="premium-card p-5 flex gap-6 items-center group">
-                        <div className="w-28 h-20 bg-romantic rounded-2xl overflow-hidden relative shadow-md">
+                        <div className="w-28 h-20 bg-black rounded-2xl overflow-hidden relative shadow-md">
                             <img src={`https://img.youtube.com/vi/${vid.id}/hqdefault.jpg`} className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all group-hover:scale-110" alt="Class" />
                             <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <Play fill="white" size={24} className="text-white" />
                             </div>
                         </div>
                         <div className="flex-1">
-                            <p className="font-black text-lg text-romantic mb-1 leading-tight">{vid.title}</p>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-romantic/30">{vid.inst}</p>
+                            <p className="font-black text-lg text-white mb-1 leading-tight">{vid.title}</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-white/30">{vid.inst}</p>
                         </div>
                         <div className={`w-12 h-12 rounded-2xl ${vid.col} flex items-center justify-center shadow-inner`}>
                             <vid.icon size={20} />
@@ -320,22 +313,22 @@ export default function Activities() {
     );
 
     return (
-        <div className="min-h-screen bg-cream text-romantic p-6 pt-12 relative overflow-x-hidden">
+        <div className="min-h-screen bg-cream text-white p-6 pt-12 relative overflow-x-hidden">
             <AnimatePresence mode="wait">
                 {activeSpace === 'home' ? (
-                    <motion.div key="home" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex-1 z-10 relative">
+                    <motion.div key="home" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex-1 z-10 relative text-white">
                         <div className="flex items-center justify-between mb-12 px-2">
                             <div className="flex items-center gap-3">
-                                <BrainCircuit className="text-romantic/30" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-romantic/30">Activity Hub</span>
+                                <BrainCircuit className="text-white/30" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Activity Hub</span>
                             </div>
-                            <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-primary animate-heartbeat">
+                            <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl shadow-sm flex items-center justify-center text-primary animate-heartbeat">
                                 <Sparkles size={20} />
                             </div>
                         </div>
 
-                        <h1 className="section-header text-romantic mb-6">Play Area.</h1>
-                        <p className="text-romantic/40 font-medium tracking-wide text-lg max-w-[280px] mb-12 italic leading-tight">
+                        <h1 className="section-header text-white mb-6">Play Area.</h1>
+                        <p className="text-white/40 font-medium tracking-wide text-lg max-w-[280px] mb-12 italic leading-tight">
                             "Shared play is the shortest distance between two souls."
                         </p>
 
@@ -344,18 +337,18 @@ export default function Activities() {
                                 <motion.div
                                     key={act.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
                                     onClick={() => act.active && setActiveSpace(act.id as any)}
-                                    className={`premium-card p-10 flex items-center justify-between transition-all duration-500 relative overflow-hidden group ${act.active ? 'cursor-pointer' : 'opacity-40 pointer-events-none grayscale'}`}
+                                    className={`premium-card p-10 flex items-center justify-between transition-all duration-500 relative overflow-hidden group border border-white/5 ${act.active ? 'cursor-pointer' : 'opacity-40 pointer-events-none grayscale'}`}
                                 >
                                     <div className="flex items-center gap-8 relative z-10">
-                                        <div className={`w-20 h-20 rounded-[30px] flex items-center justify-center transition-all duration-500 group-hover:rotate-12 ${act.bg} border-2 border-white shadow-inner ${act.color}`}>
+                                        <div className={`w-20 h-20 rounded-[30px] flex items-center justify-center transition-all duration-500 group-hover:rotate-12 bg-white/5 border-2 border-white/10 shadow-inner ${act.color}`}>
                                             <act.icon size={36} strokeWidth={1.5} />
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="font-black text-3xl tracking-tighter text-romantic italic leading-none">{act.title}</span>
-                                            <span className="text-[10px] font-bold text-romantic/30 uppercase tracking-widest mt-2 pr-6 leading-relaxed">{act.desc}</span>
+                                            <span className="font-black text-3xl tracking-tighter text-white italic leading-none">{act.title}</span>
+                                            <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-2 pr-6 leading-relaxed">{act.desc}</span>
                                         </div>
                                     </div>
-                                    <div className="w-14 h-14 bg-rose-50 rounded-full flex items-center justify-center text-romantic/20 group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+                                    <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-full flex items-center justify-center text-white/20 group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
                                         <ChevronRight size={24} />
                                     </div>
                                     <div className={`absolute top-0 right-0 w-2 h-full opacity-0 group-hover:opacity-100 transition-opacity bg-primary`}></div>
@@ -365,7 +358,7 @@ export default function Activities() {
                     </motion.div>
                 ) : (
                     <motion.div key="view" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="flex-1 flex flex-col z-10 w-full h-full relative">
-                        <button onClick={() => setActiveSpace('home')} className="flex items-center gap-4 text-romantic/40 hover:text-romantic mb-12 font-black uppercase tracking-[0.4em] text-[10px] bg-white px-8 py-5 rounded-full border border-rose-100 shadow-sm transition-all w-fit">
+                        <button onClick={() => setActiveSpace('home')} className="flex items-center gap-4 text-white/40 hover:text-white mb-12 font-black uppercase tracking-[0.4em] text-[10px] bg-white/5 border border-white/10 px-8 py-5 rounded-full shadow-sm transition-all w-fit">
                             <ChevronLeft size={16} /> Hub Core
                         </button>
                         {activeSpace === 'music' && renderMusicView()}
@@ -380,15 +373,15 @@ export default function Activities() {
             {/* Incoming Invite Overlay */}
             <AnimatePresence>
                 {incomingInvite && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md flex justify-center items-center p-6">
-                        <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-white rounded-[50px] p-10 max-w-sm w-full text-center shadow-[0_20px_60px_rgba(255,51,102,0.3)] border-4 border-rose-50">
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-xl flex justify-center items-center p-6">
+                        <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-[#121214] border border-white/10 rounded-[50px] p-10 max-w-sm w-full text-center shadow-[0_20px_60px_rgba(255,42,95,0.3)]">
                             <Heart size={60} className="text-primary animate-heartbeat mx-auto mb-6 drop-shadow-lg" fill="currentColor" />
-                            <h2 className="section-header text-romantic mb-3 text-3xl">{incomingInvite.fromName}</h2>
-                            <p className="text-romantic/60 mb-10 font-medium">Invited you to sync a {incomingInvite.activityType === 'music' ? 'live audio stream' : 'cinema experience'}.</p>
+                            <h2 className="section-header text-white mb-3 text-3xl font-serif italic">{incomingInvite.fromName}</h2>
+                            <p className="text-white/60 mb-10 font-medium">Invited you to sync a {incomingInvite.activityType === 'music' ? 'live audio stream' : 'cinema experience'}.</p>
 
                             <div className="flex gap-4">
-                                <button onClick={rejectInvite} className="flex-1 py-5 bg-cream rounded-[25px] font-black text-[10px] uppercase tracking-[0.2em] text-romantic/60 hover:text-romantic hover:bg-rose-50 transition-all border border-rose-100">Decline</button>
-                                <button onClick={acceptInvite} className="flex-1 py-5 bg-romantic text-white rounded-[25px] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:bg-primary transition-all">Accept</button>
+                                <button onClick={rejectInvite} className="flex-1 py-5 bg-white/5 rounded-[25px] font-black text-[10px] uppercase tracking-[0.2em] text-white/60 hover:text-white transition-all border border-white/5">Decline</button>
+                                <button onClick={acceptInvite} className="flex-1 py-5 bg-primary text-white rounded-[25px] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:brightness-110 transition-all">Accept</button>
                             </div>
                         </motion.div>
                     </motion.div>
@@ -398,12 +391,12 @@ export default function Activities() {
             {/* Waiting for Response Overlay */}
             <AnimatePresence>
                 {inviteState === 'waiting_response' && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md flex justify-center items-center p-6">
-                        <motion.div className="bg-white rounded-[50px] p-12 max-w-sm w-full text-center shadow-[0_20px_60px_rgba(255,51,102,0.3)] border-4 border-rose-50">
-                            <div className="w-20 h-20 mx-auto mb-8 rounded-full border-[6px] border-primary border-t-cream animate-spin"></div>
-                            <h2 className="section-header text-romantic mb-3 text-2xl">Pinging {partnerName}.</h2>
-                            <p className="text-romantic/50 font-medium italic">Waiting for them to tune into your frequency...</p>
-                            <button onClick={() => { setInviteState('idle'); clearTimeout(inviteTimeoutRef.current); }} className="mt-8 text-[10px] font-black uppercase tracking-widest text-romantic/30 hover:text-romantic transition-colors">Cancel Request</button>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-xl flex justify-center items-center p-6">
+                        <motion.div className="bg-[#121214] border border-white/10 rounded-[50px] p-12 max-w-sm w-full text-center shadow-2xl">
+                            <div className="w-20 h-20 mx-auto mb-8 rounded-full border-[6px] border-primary border-t-transparent animate-spin"></div>
+                            <h2 className="section-header text-white mb-3 text-2xl font-serif italic">Pinging {partnerName}.</h2>
+                            <p className="text-white/50 font-medium italic">Waiting for them to tune into your frequency...</p>
+                            <button onClick={() => { setInviteState('idle'); clearTimeout(inviteTimeoutRef.current); }} className="mt-8 text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-white transition-colors">Cancel Request</button>
                         </motion.div>
                     </motion.div>
                 )}
@@ -412,17 +405,17 @@ export default function Activities() {
             {/* Declined / Busy Overlay */}
             <AnimatePresence>
                 {inviteState === 'declined' && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-md flex justify-center items-center p-6">
-                        <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} className="bg-white rounded-[50px] p-10 max-w-sm w-full text-center shadow-[0_20px_60px_rgba(255,51,102,0.3)] border-4 border-rose-50">
-                            <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <Tv size={32} className="text-romantic/30" />
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-xl flex justify-center items-center p-6">
+                        <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} className="bg-[#121214] border border-white/10 rounded-[50px] p-10 max-w-sm w-full text-center shadow-2xl">
+                            <div className="w-20 h-20 bg-white/5 border border-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <Tv size={32} className="text-white/30" />
                             </div>
-                            <h2 className="section-header text-romantic mb-4 text-3xl">Busy right now.</h2>
-                            <p className="text-romantic/60 mb-10 font-medium leading-relaxed italic">{partnerName} can't join the sync at the moment. Would you like to continue on your own?</p>
+                            <h2 className="section-header text-white mb-4 text-3xl font-serif italic">Busy right now.</h2>
+                            <p className="text-white/60 mb-10 font-medium leading-relaxed italic">{partnerName} can't join the sync at the moment. Would you like to continue on your own?</p>
 
                             <div className="flex gap-4">
-                                <button onClick={() => setInviteState('idle')} className="flex-1 py-5 bg-cream rounded-[25px] font-black text-[10px] uppercase tracking-[0.2em] text-romantic/60 hover:text-romantic transition-all border border-rose-100">Cancel</button>
-                                <button onClick={() => { setInviteState('watching_together'); setShowVideoCall(false); /* Start alone */ }} className="flex-1 py-5 bg-primary text-white rounded-[25px] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:bg-romantic transition-all">Solo Mode</button>
+                                <button onClick={() => setInviteState('idle')} className="flex-1 py-5 bg-white/5 border border-white/5 rounded-[25px] font-black text-[10px] uppercase tracking-[0.2em] text-white/60 hover:text-white transition-all">Cancel</button>
+                                <button onClick={() => { setInviteState('watching_together'); setShowVideoCall(false); /* Start alone */ }} className="flex-1 py-5 bg-primary text-white rounded-[25px] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:brightness-110 transition-all">Solo Mode</button>
                             </div>
                         </motion.div>
                     </motion.div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { subscribeToWS } from './utils/wsProvider';
-import { Home, Lightbulb, MessageCircleHeart, Gamepad2, User, Flame, BrainCircuit } from 'lucide-react';
+import { Home, MessageCircleHeart, Gamepad2, User, BrainCircuit } from 'lucide-react';
 import Wellness from './pages/Wellness';
 import Sensual from './pages/Sensual';
 import { useSyncStore } from './store';
@@ -23,9 +23,7 @@ import AdminDB from './pages/AdminDB';
 const AppLogo = () => (
   <div className="relative flex items-center justify-center w-8 h-8 mr-2 overflow-visible drop-shadow-xl">
     <svg viewBox="0 0 100 100" className="w-10 h-10">
-      {/* Central Heart */}
       <path d="M50 75 C 50 75, 25 50, 25 35 C 25 22, 35 15, 45 22 C 48 24, 50 30, 50 35 C 50 30, 52 24, 55 22 C 65 15, 75 22, 75 35 C 75 50, 50 75, 50 75 Z" fill="url(#heartGrad)" style={{ filter: 'drop-shadow(0px 0px 4px rgba(255,51,102,0.8))' }} className="animate-pulse" />
-      {/* Cupping Hands Ribbon */}
       <path d="M 15 50 C 30 75, 50 85, 50 85 C 50 85, 70 75, 85 50 C 75 40, 65 65, 50 70 C 35 65, 25 40, 15 50 Z" fill="url(#handRight)" opacity="0.95" />
       <defs>
         <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#FF3366" /><stop offset="100%" stopColor="#C026D3" /></linearGradient>
@@ -40,13 +38,13 @@ const TopNav = () => {
   const customAvatar = useSyncStore(s => s.customAvatar);
 
   return (
-    <div className="sticky top-0 z-[100] px-6 py-4 flex items-center justify-between bg-white/80 backdrop-blur-xl border-b border-rose-100/50 shadow-sm">
-      <Link to="/" className="flex items-center hover:scale-105 transition-transform active:scale-95">
+    <div className="sticky top-0 z-[100] px-6 py-5 flex items-center justify-between bg-black/40 backdrop-blur-2xl border-b border-white/5">
+      <Link to="/" className="flex items-center gap-3 hover:scale-105 transition-transform active:scale-95 group">
         <AppLogo />
-        <span className="font-black text-romantic tracking-tighter text-2xl">SYNCH</span>
+        <span className="font-serif italic text-white tracking-widest text-xl group-hover:text-primary transition-colors uppercase">Synch</span>
       </Link>
       <Link to="/profile">
-        <div className="w-10 h-10 rounded-full border-2 border-rose-500/20 overflow-hidden shadow-sm transition-all hover:scale-110 active:scale-95">
+        <div className="w-10 h-10 rounded-full border border-white/10 overflow-hidden shadow-2xl transition-all hover:scale-110 active:scale-95 hover:border-primary/50 hover:shadow-primary/20">
           <img
             src={customAvatar || getAvatarUrl(user?.id)}
             alt="Profile"
@@ -65,22 +63,22 @@ const BottomNav = () => {
   const location = useLocation();
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-[400px] z-[100]">
-      <div className="bg-white/90 backdrop-blur-2xl border border-rose-100 p-2.5 rounded-[40px] flex justify-around shadow-[0_15px_40px_rgba(255,51,102,0.12)]">
-        <Link to="/" className={`p-4 rounded-[28px] transition-all duration-300 ${location.pathname === '/' ? 'bg-romantic text-white shadow-lg shadow-rose-900/20 scale-110' : 'text-romantic/30 hover:text-romantic/60'}`}>
-          <Home size={22} strokeWidth={2.5} />
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[380px] z-[100]">
+      <div className="bg-[#18181B]/80 backdrop-blur-3xl border border-white/10 p-2 rounded-[32px] flex justify-around shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <Link to="/" className={`p-3.5 rounded-[24px] transition-all duration-300 ${location.pathname === '/' ? 'bg-white/10 text-primary shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] scale-110' : 'text-white/40 hover:text-white/80'}`}>
+          <Home size={20} strokeWidth={2.5} />
         </Link>
-        <Link to="/activities" className={`p-4 rounded-[28px] transition-all duration-300 ${location.pathname === '/activities' ? 'bg-primary text-white shadow-lg shadow-rose-500/20 scale-110' : 'text-romantic/30 hover:text-romantic/60'}`}>
-          <Gamepad2 size={22} strokeWidth={2.5} />
+        <Link to="/activities" className={`p-3.5 rounded-[24px] transition-all duration-300 ${location.pathname === '/activities' ? 'bg-white/10 text-primary shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] scale-110' : 'text-white/40 hover:text-white/80'}`}>
+          <Gamepad2 size={20} strokeWidth={2.5} />
         </Link>
-        <Link to="/chat" className={`p-4 rounded-[28px] transition-all duration-300 ${location.pathname === '/chat' ? 'bg-primary text-white shadow-lg shadow-rose-500/20 scale-110' : 'text-romantic/30 hover:text-romantic/60'}`}>
-          <MessageCircleHeart size={22} strokeWidth={2.5} />
+        <Link to="/chat" className={`p-3.5 rounded-[24px] transition-all duration-300 ${location.pathname === '/chat' ? 'bg-white/10 text-primary shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] scale-110' : 'text-white/40 hover:text-white/80'}`}>
+          <MessageCircleHeart size={20} strokeWidth={2.5} />
         </Link>
-        <Link to="/wellness" className={`p-4 rounded-[28px] transition-all duration-300 ${location.pathname === '/wellness' ? 'bg-romantic text-white shadow-lg shadow-rose-900/20 scale-110' : 'text-romantic/30 hover:text-romantic/60'}`}>
-          <BrainCircuit size={22} strokeWidth={2.5} />
+        <Link to="/wellness" className={`p-3.5 rounded-[24px] transition-all duration-300 ${location.pathname === '/wellness' ? 'bg-white/10 text-primary shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] scale-110' : 'text-white/40 hover:text-white/80'}`}>
+          <BrainCircuit size={20} strokeWidth={2.5} />
         </Link>
-        <Link to="/profile" className={`p-4 rounded-[28px] transition-all duration-300 ${location.pathname === '/profile' ? 'bg-primary text-white shadow-lg shadow-rose-500/20 scale-110' : 'text-romantic/30 hover:text-romantic/60'}`}>
-          <User size={22} strokeWidth={2.5} />
+        <Link to="/profile" className={`p-3.5 rounded-[24px] transition-all duration-300 ${location.pathname === '/profile' ? 'bg-white/10 text-primary shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] scale-110' : 'text-white/40 hover:text-white/80'}`}>
+          <User size={20} strokeWidth={2.5} />
         </Link>
       </div>
     </div>
@@ -90,22 +88,9 @@ const BottomNav = () => {
 
 const Layout = () => {
   return (
-    <div className="min-h-[100dvh] bg-cream w-full max-w-md mx-auto relative shadow-2xl flex flex-col">
-      <style>{`
-        @keyframes riseUp {
-          0%   { transform: translateY(0) scale(1); opacity: 0; }
-          10%  { opacity: 1; }
-          90%  { opacity: 0.5; }
-          100% { transform: translateY(-100vh) scale(0.5) rotate(20deg); opacity: 0; }
-        }
-        @keyframes floatOrb {
-          0%, 100% { transform: translate(0,0) scale(1); }
-          33% { transform: translate(30px,-40px) scale(1.05); }
-          66% { transform: translate(-20px,20px) scale(0.97); }
-        }
-      `}</style>
+    <div className="min-h-[100dvh] bg-cream w-full max-w-md mx-auto relative shadow-[0_0_100px_rgba(0,0,0,0.8)] flex flex-col border-x border-white/5 overflow-hidden">
       <TopNav />
-      <div className="flex-1 pb-24 relative">
+      <div className="flex-1 pb-28 relative overflow-y-auto">
         <Outlet />
       </div>
       <BottomNav />
@@ -147,7 +132,6 @@ function App() {
         })
         .catch(() => { setPartner(null); });
 
-      // Global Network Listener for Real-Time Sync Breaking
       const unsubscribe = subscribeToWS((data) => {
         if (data.type === 'break_sync' && data.partnerId === user.id) {
           setPartner(null);
@@ -156,7 +140,7 @@ function App() {
       });
       return () => unsubscribe();
     }
-  }, [user?.id]);
+  }, [user?.id, setProfile, setPartner]);
 
   const handleOnboardingComplete = () => {
     localStorage.setItem('syncheart_onboarding', 'true');
@@ -171,7 +155,6 @@ function App() {
     <div className="bg-black min-h-screen text-white flex justify-center">
       <BrowserRouter>
         <Routes>
-          {/* Public Route */}
           {!user ? (
             <Route path="*" element={<Login />} />
           ) : (
@@ -186,7 +169,6 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<AdminDB />} />
 
-              {/* Linked Routes */}
               <Route path="/memories" element={<Memories />} />
               <Route path="/love-language" element={<LoveLanguage />} />
               <Route path="/mood" element={<Mood />} />
